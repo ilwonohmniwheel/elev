@@ -58,10 +58,18 @@ button{font:inherit;color:inherit}
 .problem .ops li{margin:3px 0}
 .problem .note{margin:8px 0 0;font-size:13px;color:var(--ink-soft);max-width:100ch}
 
-.probs{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:12px}
+.probs{margin-bottom:12px}
+.pgroups{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:10px}
+.pgroup{border:1px solid var(--line);border-radius:10px;background:var(--surface);padding:10px 12px}
+.pgroup.cur{border-color:var(--ink);box-shadow:0 0 0 1px var(--ink) inset}
+.pgroup h3{margin:0;font-size:15px;display:flex;align-items:baseline;gap:8px;flex-wrap:wrap}
+.pgroup h3 .rng{font-size:12.5px;font-weight:600;color:var(--ink-soft)}
+.pgroup p{margin:4px 0 8px;font-size:13px;color:var(--ink-soft);line-height:1.45}
+.ptag{display:inline-block;font-size:12.5px;font-weight:700;padding:2px 8px;border-radius:999px;background:var(--bg);border:1px solid var(--line);margin-right:8px;vertical-align:2px}
 .probs-cap{font-size:13px;font-weight:600;color:var(--ink-soft);min-width:128px}
 .probs-list button:disabled{cursor:not-allowed;opacity:.45;border-style:dashed}
 .probs-list{display:flex;gap:6px;flex-wrap:wrap}
+.probs-list button{flex:1 1 auto}
 .probs-list button{border:1px solid var(--line);background:var(--surface);border-radius:8px;padding:6px 12px;cursor:pointer;font-size:14px;font-weight:600;display:flex;align-items:center;gap:8px}
 .probs-list button .pn{display:inline-grid;place-items:center;min-width:24px;height:24px;border-radius:6px;background:var(--bg);font-size:13px}
 .probs-list button[aria-current="true"]{border-color:var(--ink);box-shadow:0 0 0 1px var(--ink) inset}
@@ -288,8 +296,7 @@ button{font:inherit;color:inherit}
   </header>
 
   <nav class="probs" aria-label="공개문제 선택">
-    <span class="probs-cap">공개문제</span>
-    <div id="probList" class="probs-list"></div>
+    <div id="probList" class="pgroups"></div>
   </nav>
   <section class="problem">
     <h2 id="probTitle"></h2>
@@ -333,8 +340,8 @@ const COMP_MAX = {EOCR:12,MC1:12,MC2:12,T:8,T1:8,T2:8,FR:8,X:8};
 /* ================= 공개문제 목록 ================= */
 const PROBLEMS=[
   {no:1,short:'T1 정·역 전환',ready:true},
-  {no:2,short:'T1·T2 지연 역전',ready:true},{no:3,short:'정·역 후 자동 정지',ready:true},{no:4,short:'T2 후 역회전 유지',ready:true},{no:5,short:'지연 정회전 후 역전',ready:true},
-  {no:6,short:'Y-Δ 기동',ready:true},{no:7,short:'Y-Δ + 교대 점멸',ready:true},{no:8,short:'전동기 2대 순차',ready:true},{no:9,short:'M1 간헐 → M2',ready:true},{no:10,short:'교대 → 동시 운전',ready:true}
+  {no:2,short:'T2 지연 후 역전',ready:true},{no:3,short:'정·역 후 자동 정지',ready:true},{no:4,short:'역회전 유지',ready:true},{no:5,short:'지연 정회전',ready:true},
+  {no:6,short:'YL 점멸 경보',ready:true},{no:7,short:'RL·GL 교대 점멸',ready:true},{no:8,short:'M1 → M2 간헐',ready:true},{no:9,short:'M1 간헐 → M2',ready:true},{no:10,short:'교대 → 동시',ready:true}
 ];
 const CUR_PROB=(()=>{ const m=location.hash.match(/p(\d+)/); const v=m?+m[1]:1; return PROBLEMS.some(p=>p.no===v&&p.ready)?v:1; })();
 
@@ -420,7 +427,7 @@ const P1 = (()=>{
   ];
   const sym = ()=>{
     let s='';
-    s+=`<circle class="fillp" cx="${EP}" cy="460" r="16"/>`+T_(EP,463,'EOCR','lbl c" style="font-size:8px')+term(EP,444)+term(EP,476);
+    s+=`<circle class="fillp" cx="${EP}" cy="460" r="16"/>`+T_(EP,463,'EOCR','lbl c" style="font-size:8px');
     s+=hContact(EB1,EB2,'b',{eocr:1,label:'EOCR'});
     s+=hContact(PB1x,PB2x,'b',{pb:1,label:'PB0'});
     s+=contact(EA,110,150,'a',{label:'EOCR',eocr:1});
@@ -511,7 +518,7 @@ const P2 = (()=>{
   ];
   const sym = ()=>{
     let s='';
-    s+=`<circle class="fillp" cx="${EP}" cy="460" r="16"/>`+T_(EP,463,'EOCR','lbl c" style="font-size:8px')+term(EP,444)+term(EP,476);
+    s+=`<circle class="fillp" cx="${EP}" cy="460" r="16"/>`+T_(EP,463,'EOCR','lbl c" style="font-size:8px');
     s+=hContact(EB1,EB2,'b',{eocr:1,label:'EOCR'});
     s+=hContact(PB1x,PB2x,'b',{pb:1,label:'PB0'});
     s+=contact(EA,290,330,'a',{label:'EOCR',eocr:1});
@@ -603,7 +610,7 @@ const P3 = (()=>{
   ];
   const sym = ()=>{
     let s='';
-    s+=`<circle class="fillp" cx="${EP}" cy="460" r="16"/>`+T_(EP,463,'EOCR','lbl c" style="font-size:8px')+term(EP,444)+term(EP,476);
+    s+=`<circle class="fillp" cx="${EP}" cy="460" r="16"/>`+T_(EP,463,'EOCR','lbl c" style="font-size:8px');
     s+=hContact(EB1,EB2,'b',{eocr:1,label:'EOCR'});
     s+=hContact(PB1x,PB2x,'b',{pb:1,label:'PB0'});
     s+=contact(EA,290,330,'a',{label:'EOCR',eocr:1});
@@ -696,7 +703,7 @@ const P4 = (()=>{
   ];
   const sym = ()=>{
     let s='';
-    s+=`<circle class="fillp" cx="${EP}" cy="460" r="16"/>`+T_(EP,463,'EOCR','lbl c" style="font-size:8px')+term(EP,444)+term(EP,476);
+    s+=`<circle class="fillp" cx="${EP}" cy="460" r="16"/>`+T_(EP,463,'EOCR','lbl c" style="font-size:8px');
     s+=hContact(EB1,EB2,'b',{eocr:1,label:'EOCR'});
     s+=hContact(PB1x,PB2x,'b',{pb:1,label:'PB0'});
     s+=contact(EA,290,330,'a',{label:'EOCR',eocr:1});
@@ -789,7 +796,7 @@ const P5 = (()=>{
   ];
   const sym = ()=>{
     let s='';
-    s+=`<circle class="fillp" cx="${EP}" cy="460" r="16"/>`+T_(EP,463,'EOCR','lbl c" style="font-size:8px')+term(EP,444)+term(EP,476);
+    s+=`<circle class="fillp" cx="${EP}" cy="460" r="16"/>`+T_(EP,463,'EOCR','lbl c" style="font-size:8px');
     s+=hContact(EB1,EB2,'b',{eocr:1,label:'EOCR'});
     s+=hContact(PB1x,PB2x,'b',{pb:1,label:'PB0'});
     s+=contact(EA,290,330,'a',{label:'EOCR',eocr:1});
@@ -911,7 +918,7 @@ const P6 = (()=>{
     [40,80,120].forEach((x,i)=>{ s+=`<rect class="fillp" x="${x-5}" y="20" width="10" height="10"/>`+T_(x,14,['L1','L2','L3'][i],'lbl c sm'); });
     s+=T_(134,29,'3P3W AC 220V','tag')+T_(134,60,'MCCB 생략 (직결)','tag');
     s+=`<rect class="fillp" x="22" y="110" width="116" height="30" rx="2"/>`;
-    [40,80,120].forEach(x=>s+=L(x,110,x,140)+`<circle class="fillp" cx="${x}" cy="125" r="5"/>`+term(x,110)+term(x,140));
+    [40,80,120].forEach(x=>s+=L(x,110,x,140)+`<circle class="fillp" cx="${x}" cy="125" r="5"/>`);
     s+=T_(146,130,'EOCR','lbl sm');
     [190,230,270].forEach(x=>s+=mainContact(x,230,270)); s+=L(195.5,251.5,280,251.5,'dash')+T_(284,247,'MC2','lbl sm')+T_(284,262,'(Δ)','tag');
     [40,80,120].forEach((x,i)=>{ s+=`<rect class="fillp" x="${x-5}" y="200" width="10" height="10"/>`+T_(x+8,209,['U','V','W'][i],'tag'); });
@@ -923,7 +930,7 @@ const P6 = (()=>{
   };
   const sym = ()=>{
     let s='';
-    s+=`<circle class="fillp" cx="${EP}" cy="460" r="16"/>`+T_(EP,463,'EOCR','lbl c" style="font-size:8px')+term(EP,444)+term(EP,476);
+    s+=`<circle class="fillp" cx="${EP}" cy="460" r="16"/>`+T_(EP,463,'EOCR','lbl c" style="font-size:8px');
     s+=hContact(EB1,EB2,'b',{eocr:1,label:'EOCR'});
     s+=hContact(PB1x,PB2x,'b',{pb:1,label:'PB0'});
     s+=contact(EA,110,150,'a',{label:'EOCR',eocr:1});
@@ -1017,7 +1024,7 @@ const P7 = (()=>{
   ];
   const sym = ()=>{
     let s='';
-    s+=`<circle class="fillp" cx="${EP}" cy="460" r="16"/>`+T_(EP,463,'EOCR','lbl c" style="font-size:8px')+term(EP,444)+term(EP,476);
+    s+=`<circle class="fillp" cx="${EP}" cy="460" r="16"/>`+T_(EP,463,'EOCR','lbl c" style="font-size:8px');
     s+=hContact(EB1,EB2,'b',{eocr:1,label:'EOCR'});
     s+=contact(EA,290,330,'a',{label:'EOCR',eocr:1});
     s+=lamp(EA,'YL');
@@ -1130,7 +1137,7 @@ const PR8 = (()=>{
     [40,80,120].forEach((x,i)=>{ s+=`<rect class="fillp" x="${x-5}" y="20" width="10" height="10"/>`+T_(x,14,['L1','L2','L3'][i],'lbl c sm'); });
     s+=T_(134,29,'3P AC 220V','tag')+T_(134,60,'MCCB 생략 (직결)','tag');
     s+=`<rect class="fillp" x="22" y="110" width="116" height="30" rx="2"/>`;
-    [40,80,120].forEach(x=>s+=L(x,110,x,140)+`<circle class="fillp" cx="${x}" cy="125" r="5"/>`+term(x,110)+term(x,140));
+    [40,80,120].forEach(x=>s+=L(x,110,x,140)+`<circle class="fillp" cx="${x}" cy="125" r="5"/>`);
     s+=T_(146,130,'EOCR','lbl sm');
     [40,80,120].forEach(x=>s+=mainContact(x,220,260)); s+=L(45.5,241.5,128,241.5,'dash')+T_(134,246,'MC1','lbl sm');
     [190,230,270].forEach(x=>s+=mainContact(x,220,260)); s+=L(195.5,241.5,280,241.5,'dash')+T_(284,246,'MC2','lbl sm');
@@ -1141,7 +1148,7 @@ const PR8 = (()=>{
   };
   const sym = ()=>{
     let s='';
-    s+=`<circle class="fillp" cx="${EP}" cy="460" r="16"/>`+T_(EP,463,'EOCR','lbl c" style="font-size:8px')+term(EP,444)+term(EP,476);
+    s+=`<circle class="fillp" cx="${EP}" cy="460" r="16"/>`+T_(EP,463,'EOCR','lbl c" style="font-size:8px');
     s+=hContact(EB1,EB2,'b',{eocr:1,label:'EOCR'});
     s+=contact(EA,290,330,'a',{label:'EOCR',eocr:1});
     s+=lamp(EA,'YL');
@@ -1233,7 +1240,7 @@ const PR9 = (()=>{
   ];
   const sym = ()=>{
     let s='';
-    s+=`<circle class="fillp" cx="${EP}" cy="460" r="16"/>`+T_(EP,463,'EOCR','lbl c" style="font-size:8px')+term(EP,444)+term(EP,476);
+    s+=`<circle class="fillp" cx="${EP}" cy="460" r="16"/>`+T_(EP,463,'EOCR','lbl c" style="font-size:8px');
     s+=hContact(EB1,EB2,'b',{eocr:1,label:'EOCR'});
     s+=contact(EA,290,330,'a',{label:'EOCR',eocr:1});
     s+=lamp(EA,'YL');
@@ -1324,7 +1331,7 @@ const PR10 = (()=>{
   ];
   const sym = ()=>{
     let s='';
-    s+=`<circle class="fillp" cx="${EP}" cy="460" r="16"/>`+T_(EP,463,'EOCR','lbl c" style="font-size:8px')+term(EP,444)+term(EP,476);
+    s+=`<circle class="fillp" cx="${EP}" cy="460" r="16"/>`+T_(EP,463,'EOCR','lbl c" style="font-size:8px');
     s+=hContact(EB1,EB2,'b',{eocr:1,label:'EOCR'});
     s+=contact(EA,290,330,'a',{label:'EOCR',eocr:1});
     s+=lamp(EA,'YL');
@@ -1425,18 +1432,18 @@ function mainContact(x,y1,y2){
   return L(x,y1,x,y1+st)+L(x,y2-st,x,y2)+L(x,y2-st,x+11,y1+st+3)+term(x,y1)+term(x,y2);
 }
 function coil(x,label,small){
-  return `<circle class="fillp" cx="${x}" cy="460" r="16"/>`+`<text class="lbl c${small?' sm':''}" x="${x}" y="${small?464:465}">${label}</text>`+term(x,444)+term(x,476);
+  return `<circle class="fillp" cx="${x}" cy="460" r="16"/>`+`<text class="lbl c${small?' sm':''}" x="${x}" y="${small?464:465}">${label}</text>`;
 }
 function lamp(x,label){
   const d=11.3;
-  return `<circle class="lamp${label}" cx="${x}" cy="460" r="16"/>`+L(x-d,460-d,x+d,460+d)+L(x-d,460+d,x+d,460-d)+term(x,444)+term(x,476)+T_(x+6,500,label,'lbl sm');
+  return `<circle class="lamp${label}" cx="${x}" cy="460" r="16"/>`+L(x-d,460-d,x+d,460+d)+L(x-d,460+d,x+d,460-d)+T_(x+6,500,label,'lbl sm');
 }
 function mainSym(){
   let s='';
   [40,80,120].forEach((x,i)=>{ s+=`<rect class="fillp" x="${x-5}" y="20" width="10" height="10"/>`+T_(x,14,['L1','L2','L3'][i],'lbl c sm'); });
   s+=T_(134,29,'3P3W AC 220V','tag')+T_(134,60,'MCCB 생략 (직결)','tag');
   s+=`<rect class="fillp" x="22" y="110" width="116" height="30" rx="2"/>`;
-  [40,80,120].forEach(x=>s+=L(x,110,x,140)+`<circle class="fillp" cx="${x}" cy="125" r="5"/>`+term(x,110)+term(x,140));
+  [40,80,120].forEach(x=>s+=L(x,110,x,140)+`<circle class="fillp" cx="${x}" cy="125" r="5"/>`);
   s+=T_(146,130,'EOCR','lbl sm');
   [40,80,120].forEach(x=>s+=mainContact(x,220,260)); s+=L(45.5,241.5,128,241.5,'dash')+T_(134,246,'MC1','lbl sm');
   [190,230,270].forEach(x=>s+=mainContact(x,220,260)); s+=L(195.5,241.5,280,241.5,'dash')+T_(284,246,'MC2','lbl sm');
@@ -1932,9 +1939,15 @@ $('#resetAll').addEventListener('click',()=>{
   state.pins={}; state.checked=false; wired.clear(); state.quiz={}; state.mode='pins';
   Object.assign(sel,{slot:null,wire:null,hint:null,q:null}); closeKeypad(); render();
 });
-$('#probList').innerHTML=PROBLEMS.map(p=>`<button data-prob="${p.no}" aria-current="${p.no===CUR_PROB}"${p.ready?'':' disabled title="준비 중"'}><span class="pn">${p.no}</span>${p.short?`<span class="pt">${p.short}</span>`:''}</button>`).join('');
+const PGROUPS=[
+  {name:'정·역 운전',nos:[1,2,3,4,5],desc:'MC1 정회전, MC2 역회전. MC2 주접점에서 L1과 L3를 바꿔 넣고, 타이머로 정회전과 역회전을 전환합니다.'},
+  {name:'Y-Δ 기동',nos:[6,7],desc:'MC1이 X Y Z를 묶어 Y 결선으로 기동하고, 타이머 뒤 MC2가 Δ 결선으로 운전합니다. 전동기 단자대가 U V W와 X Y Z 2개예요.'},
+  {name:'전동기 2대 순차 운전',nos:[8,9,10],desc:'MC1이 M1, MC2가 M2를 돌립니다. 타이머와 플리커 릴레이(FR)로 운전 순서와 간헐·교대 운전을 만듭니다.'}
+];
+const GROUP_OF=n=>PGROUPS.find(g=>g.nos.includes(n));
+$('#probList').innerHTML=PGROUPS.map(g=>`<section class="pgroup${g.nos.includes(CUR_PROB)?' cur':''}"><h3>${g.name}<span class="rng">공개문제 ${g.nos[0]}~${g.nos[g.nos.length-1]}</span></h3><p>${g.desc}</p><div class="probs-list">${g.nos.map(no=>{const p=PROBLEMS.find(q=>q.no===no);return `<button data-prob="${p.no}" aria-current="${p.no===CUR_PROB}"${p.ready?'':' disabled title="준비 중"'}><span class="pn">${p.no}</span>${p.short?`<span class="pt">${p.short}</span>`:''}</button>`;}).join('')}</div></section>`).join('');
 $('#probList').addEventListener('click',e=>{ const b=e.target.closest('[data-prob]'); if(!b||b.disabled||+b.dataset.prob===CUR_PROB) return; location.hash='p'+b.dataset.prob; location.reload(); });
-$('#probTitle').textContent=`공개문제 ${CUR_PROB}. ${PD.title}`;
+$('#probTitle').innerHTML=`<span class="ptag">${GROUP_OF(CUR_PROB).name}</span>공개문제 ${CUR_PROB}. ${PD.title}`;
 $('#ops').innerHTML=PD.OPS;
 document.title=`공개문제 ${CUR_PROB} | 승강기기능사 실기 연습장`;
 window.addEventListener('hashchange',()=>location.reload());
