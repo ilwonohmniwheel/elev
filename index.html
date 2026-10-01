@@ -427,10 +427,10 @@ const P1 = (()=>{
     s+=coil(EA,'T2');
     s+=contact(YLx,290,330,'b',{label:'T2',timer:1});
     s+=lamp(YLx,'YL');
-    s+=contact(S,70,110,'a',{pb:1,label:'PB1',lx:22});
+    s+=contact(S,70,110,'a',{pb:1,label:'PB1',lx:17});
     s+=contact(TS,70,110,'a',{label:'T1'});
     s+=contact(S,200,240,'b',{label:'T1',timer:1});
-    s+=contact(M2,200,240,'a',{label:'T1',timer:1,lx:22});
+    s+=contact(M2,200,240,'a',{label:'T1',timer:1,lx:17});
     s+=coil(TS,'T1');
     s+=contact(S,290,330,'b',{label:'MC2'})+contact(M2,290,330,'b',{label:'MC1'});
     s+=coil(S,'MC1',true)+coil(M2,'MC2',true);
@@ -518,14 +518,14 @@ const P2 = (()=>{
     s+=lamp(EA,'YL');
     s+=contact(RLx,70,110,'a',{label:'MC1'})+contact(GLx,70,110,'a',{label:'MC2'});
     s+=lamp(RLx,'RL')+lamp(GLx,'GL');
-    s+=contact(S,70,110,'a',{pb:1,label:'PB1',lx:22});
+    s+=contact(S,70,110,'a',{pb:1,label:'PB1',lx:17});
     s+=contact(TS,70,110,'a',{label:'T1'});
     s+=contact(S,200,240,'b',{label:'T1',timer:1});
-    s+=contact(T2x,200,240,'a',{label:'T1',timer:1,lx:22});
+    s+=contact(T2x,200,240,'a',{label:'T1',timer:1,lx:17});
     s+=coil(TS,'T1');
     s+=contact(S,290,330,'b',{label:'MC2'})+coil(S,'MC1',true);
     s+=coil(T2x,'T2');
-    s+=contact(M2,285,325,'a',{label:'T2',timer:1,lx:22});
+    s+=contact(M2,285,325,'a',{label:'T2',timer:1,lx:17});
     s+=contact(M2,355,395,'b',{label:'MC1'});
     s+=coil(M2,'MC2',true);
     return s;
@@ -608,11 +608,11 @@ const P3 = (()=>{
     s+=hContact(PB1x,PB2x,'b',{pb:1,label:'PB0'});
     s+=contact(EA,290,330,'a',{label:'EOCR',eocr:1});
     s+=lamp(EA,'YL');
-    s+=contact(S,70,110,'a',{pb:1,label:'PB1',lx:22});
+    s+=contact(S,70,110,'a',{pb:1,label:'PB1',lx:17});
     s+=contact(TS,70,110,'a',{label:'T1'});
     s+=contact(S,200,240,'b',{label:'T1',timer:1});
     s+=contact(TS,200,240,'b',{label:'T2',timer:1});
-    s+=contact(M2,200,240,'a',{label:'T1',timer:1,lx:22});
+    s+=contact(M2,200,240,'a',{label:'T1',timer:1,lx:17});
     s+=contact(S,290,330,'b',{label:'MC2'})+coil(S,'MC1',true);
     s+=coil(TS,'T1');
     s+=contact(M2,290,330,'b',{label:'MC1'})+coil(M2,'MC2',true);
@@ -703,12 +703,12 @@ const P4 = (()=>{
     s+=lamp(EA,'YL');
     s+=contact(RLx,70,110,'a',{label:'MC2'})+contact(GLx,70,110,'a',{label:'MC1'});
     s+=lamp(RLx,'RL')+lamp(GLx,'GL');
-    s+=contact(S,70,110,'a',{pb:1,label:'PB1',lx:22});
+    s+=contact(S,70,110,'a',{pb:1,label:'PB1',lx:17});
     s+=contact(TS,70,110,'a',{label:'T1'});
     s+=contact(S,200,240,'b',{label:'T2',timer:1});
     s+=contact(S,290,330,'b',{label:'MC2'})+coil(S,'MC1',true);
     s+=coil(TS,'T1');
-    s+=contact(B,70,110,'a',{label:'T1',timer:1,lx:22});
+    s+=contact(B,70,110,'a',{label:'T1',timer:1,lx:17});
     s+=contact(BT,70,110,'a',{label:'T2'});
     s+=contact(B,290,330,'b',{label:'MC1'})+coil(B,'MC2',true);
     s+=coil(BT,'T2');
@@ -794,16 +794,16 @@ const P5 = (()=>{
     s+=hContact(PB1x,PB2x,'b',{pb:1,label:'PB0'});
     s+=contact(EA,290,330,'a',{label:'EOCR',eocr:1});
     s+=lamp(EA,'YL');
-    s+=contact(S,70,110,'a',{pb:1,label:'PB1',lx:22});
+    s+=contact(S,70,110,'a',{pb:1,label:'PB1',lx:17});
     s+=contact(TS,70,110,'a',{label:'T1'});
     s+=coil(S,'T1');
-    s+=contact(TS,340,380,'a',{label:'T1',timer:1,lx:22});
+    s+=contact(TS,340,380,'a',{label:'T1',timer:1,lx:17});
     s+=coil(TS,'T2');
     s+=contact(A,70,110,'b',{label:'T2',timer:1});
     s+=contact(A,160,200,'a',{label:'T2'});
     s+=contact(A,330,370,'b',{label:'MC2'})+coil(A,'MC1',true);
     s+=contact(RLx,330,370,'a',{label:'MC1'})+lamp(RLx,'RL');
-    s+=contact(B,70,110,'a',{label:'T2',timer:1,lx:22});
+    s+=contact(B,70,110,'a',{label:'T2',timer:1,lx:17});
     s+=contact(B,330,370,'b',{label:'MC1'})+coil(B,'MC2',true);
     s+=contact(GLx,330,370,'a',{label:'MC2'})+lamp(GLx,'GL');
     return s;
@@ -928,13 +928,13 @@ const P6 = (()=>{
     s+=hContact(PB1x,PB2x,'b',{pb:1,label:'PB0'});
     s+=contact(EA,110,150,'a',{label:'EOCR',eocr:1});
     s+=coil(EA,'FR');
-    s+=contact(YLx,290,330,'b',{label:'FR',flicker:1,lx:18});
+    s+=contact(YLx,290,330,'b',{label:'FR',flicker:1,lx:15});
     s+=lamp(YLx,'YL');
-    s+=contact(S,70,110,'a',{pb:1,label:'PB1',lx:22});
+    s+=contact(S,70,110,'a',{pb:1,label:'PB1',lx:17});
     s+=contact(TS,70,110,'a',{label:'T'});
     s+=coil(S,'T');
     s+=contact(TS,200,240,'b',{label:'T',timer:1});
-    s+=contact(M2,200,240,'a',{label:'T',timer:1,lx:22});
+    s+=contact(M2,200,240,'a',{label:'T',timer:1,lx:17});
     s+=contact(TS,290,330,'b',{label:'MC2'})+coil(TS,'MC1',true);
     s+=contact(M2,290,330,'b',{label:'MC1'})+coil(M2,'MC2',true);
     s+=contact(RLx,70,110,'a',{label:'MC1'})+contact(GLx,70,110,'a',{label:'MC2'});
@@ -1021,17 +1021,17 @@ const P7 = (()=>{
     s+=hContact(EB1,EB2,'b',{eocr:1,label:'EOCR'});
     s+=contact(EA,290,330,'a',{label:'EOCR',eocr:1});
     s+=lamp(EA,'YL');
-    s+=contact(S,70,110,'a',{pb:1,label:'PB1',lx:22});
+    s+=contact(S,70,110,'a',{pb:1,label:'PB1',lx:17});
     s+=contact(TS,70,110,'a',{label:'T'});
     s+=contact(S,200,240,'b',{pb:1,label:'PB0'});
     s+=coil(S,'T');
     s+=contact(TS,200,240,'b',{label:'T',timer:1});
-    s+=contact(M2,200,240,'a',{label:'T',timer:1,lx:22});
+    s+=contact(M2,200,240,'a',{label:'T',timer:1,lx:17});
     s+=contact(TS,290,330,'b',{label:'MC2'})+coil(TS,'MC1',true);
     s+=contact(M2,290,330,'b',{label:'MC1'})+coil(M2,'MC2',true);
     s+=contact(RLx,70,110,'a',{label:'MC1'})+lamp(RLx,'RL');
-    s+=contact(GLx,200,240,'a',{label:'FR',flicker:1,lx:22});
-    s+=contact(GLx,290,330,'b',{label:'FR',flicker:1,lx:18});
+    s+=contact(GLx,200,240,'a',{label:'FR',flicker:1,lx:17});
+    s+=contact(GLx,290,330,'b',{label:'FR',flicker:1,lx:15});
     s+=lamp(GLx,'GL');
     s+=contact(FRx,70,110,'a',{label:'MC2'})+coil(FRx,'FR');
     return s;
@@ -1145,15 +1145,15 @@ const PR8 = (()=>{
     s+=hContact(EB1,EB2,'b',{eocr:1,label:'EOCR'});
     s+=contact(EA,290,330,'a',{label:'EOCR',eocr:1});
     s+=lamp(EA,'YL');
-    s+=contact(S,70,110,'a',{pb:1,label:'PB1',lx:22});
+    s+=contact(S,70,110,'a',{pb:1,label:'PB1',lx:17});
     s+=contact(TS,70,110,'a',{label:'T'});
     s+=contact(S,200,240,'b',{pb:1,label:'PB0'});
     s+=coil(S,'T');
     s+=contact(TS,200,240,'b',{label:'T',timer:1});
     s+=contact(TS,290,330,'b',{label:'MC2'})+coil(TS,'MC1',true);
-    s+=contact(F,200,240,'a',{label:'T',timer:1,lx:22});
+    s+=contact(F,200,240,'a',{label:'T',timer:1,lx:17});
     s+=coil(F,'FR');
-    s+=contact(M2,200,240,'a',{label:'FR',flicker:1,lx:22});
+    s+=contact(M2,200,240,'a',{label:'FR',flicker:1,lx:17});
     s+=contact(M2,290,330,'b',{label:'MC1'})+coil(M2,'MC2',true);
     s+=contact(RLx,70,110,'a',{label:'MC1'})+contact(GLx,70,110,'a',{label:'MC2'});
     s+=lamp(RLx,'RL')+lamp(GLx,'GL');
@@ -1237,15 +1237,15 @@ const PR9 = (()=>{
     s+=hContact(EB1,EB2,'b',{eocr:1,label:'EOCR'});
     s+=contact(EA,290,330,'a',{label:'EOCR',eocr:1});
     s+=lamp(EA,'YL');
-    s+=contact(S,70,110,'a',{pb:1,label:'PB1',lx:22});
+    s+=contact(S,70,110,'a',{pb:1,label:'PB1',lx:17});
     s+=contact(TS,70,110,'a',{label:'T'});
     s+=contact(S,200,240,'b',{pb:1,label:'PB0'});
     s+=coil(S,'T');
     s+=contact(TS,200,240,'b',{label:'T',timer:1});
-    s+=contact(TS,290,330,'b',{label:'FR',flicker:1,lx:18});
+    s+=contact(TS,290,330,'b',{label:'FR',flicker:1,lx:15});
     s+=contact(TS,360,400,'b',{label:'MC2'})+coil(TS,'MC1',true);
     s+=coil(F,'FR');
-    s+=contact(M2,200,240,'a',{label:'T',timer:1,lx:22});
+    s+=contact(M2,200,240,'a',{label:'T',timer:1,lx:17});
     s+=contact(M2,290,330,'b',{label:'MC1'})+coil(M2,'MC2',true);
     s+=contact(RLx,200,240,'a',{label:'MC1'})+contact(GLx,200,240,'a',{label:'MC2'});
     s+=lamp(RLx,'RL')+lamp(GLx,'GL');
@@ -1328,16 +1328,16 @@ const PR10 = (()=>{
     s+=hContact(EB1,EB2,'b',{eocr:1,label:'EOCR'});
     s+=contact(EA,290,330,'a',{label:'EOCR',eocr:1});
     s+=lamp(EA,'YL');
-    s+=contact(S,70,110,'a',{pb:1,label:'PB1',lx:22});
+    s+=contact(S,70,110,'a',{pb:1,label:'PB1',lx:17});
     s+=contact(TS,70,110,'a',{label:'T'});
     s+=contact(S,200,240,'b',{pb:1,label:'PB0'});
     s+=coil(S,'T');
     s+=contact(TS,200,240,'b',{label:'T',timer:1});
     s+=coil(TS,'FR');
-    s+=contact(C3,200,240,'b',{label:'FR',flicker:1,lx:18})+coil(C3,'MC1',true);
+    s+=contact(C3,200,240,'b',{label:'FR',flicker:1,lx:15})+coil(C3,'MC1',true);
     s+=contact(RLx,200,240,'a',{label:'MC1'})+lamp(RLx,'RL');
-    s+=contact(C5,200,240,'a',{label:'FR',flicker:1,lx:22})+coil(C5,'MC2',true);
-    s+=contact(C6,200,240,'a',{label:'T',timer:1,lx:22});
+    s+=contact(C5,200,240,'a',{label:'FR',flicker:1,lx:17})+coil(C5,'MC2',true);
+    s+=contact(C6,200,240,'a',{label:'T',timer:1,lx:17});
     s+=contact(C6,290,330,'a',{label:'MC2'})+lamp(C6,'GL');
     return s;
   };
@@ -1394,26 +1394,28 @@ const QUIZ = [
 const L=(x1,y1,x2,y2,c)=>`<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}"${c?` class="${c}"`:''}/>`;
 const term=(x,y)=>`<circle class="term" cx="${x}" cy="${y}" r="2.3"/>`;
 const T_=(x,y,s,c='lbl')=>`<text class="${c}" x="${x}" y="${y}">${s}</text>`;
-/* 제어회로 접점: 공개문제 도면 방식 (단자 o o + 막대. a: 오른쪽에 떨어진 막대 / b: 왼쪽에 닿은 막대) */
+/* 제어회로 접점: 공개문제 도면 방식
+   a접점: 단자 o o 오른쪽에 떨어진 막대 / b접점: 단자 왼쪽에 닿은 막대
+   타이머 한시: 막대 오른쪽에 붙은 ">" 표시 / 플리커(FR): 막대 위에 걸친 검은 마름모
+   푸시버튼: 막대 가운데에서 오른쪽으로 뻗은 짧은 가로선 */
 function contact(x,y1,y2,type,o={}){
   const st=Math.min(10,(y2-y1)/4), t1=y1+st, t2=y2-st, my=(t1+t2)/2, isA=type==='a';
-  const bx = isA ? x+7 : x-3.3, out = isA ? 1 : -1;
-  let s=L(x,y1,x,t1)+L(x,t2,x,y2)+L(bx,t1-4,bx,t2+4);
-  if(o.pb) s+=L(bx,my,bx+8*out,my);
-  if(o.timer){ const tx = isA ? bx : x+2.5; s+=`<path d="M${tx} ${my-6} L${tx+9} ${my} L${tx} ${my+6}"/>`; }
-  if(o.flicker){ const fx = isA ? bx : x+6; s+=`<path d="M${fx-6} ${my} L${fx} ${my-3.6} L${fx+6} ${my} L${fx} ${my+3.6} Z" style="fill:var(--ink)"/>`; }
-  if(o.eocr) s+=L(bx-5,my-5,bx+5,my+5)+L(bx-5,my+5,bx+5,my-5);
+  const bx = isA ? x+7 : x-3.3;
+  let s=L(x,y1,x,t1)+L(x,t2,x,y2)+L(bx,t1-2.6,bx,t2+2.6);
+  if(o.pb) s+=L(bx,my,bx+6,my);
+  if(o.timer) s+=`<path d="M${bx} ${my-2.6} L${bx+4.2} ${my} L${bx} ${my+2.6}" fill="none"/>`;
+  if(o.flicker) s+=`<path d="M${bx-4.2} ${my} L${bx} ${my-2.8} L${bx+4.2} ${my} L${bx} ${my+2.8} Z" style="fill:var(--ink);stroke:var(--ink)"/>`;
+  if(o.eocr) s+=L(bx-2.6,my-2.6,bx+2.6,my+2.6)+L(bx-2.6,my+2.6,bx+2.6,my-2.6);
   s+=term(x,t1)+term(x,t2);
   if(o.label) s+=T_(x+(o.lx||15),my+5,o.label);
   return s;
 }
-/* 윗줄 전원선 위의 가로 접점 (b접점: 아래에 닿은 막대) */
+/* 윗줄 전원선 위의 가로 접점 (b접점: 단자 아래에 닿은 막대 / 푸시버튼: 막대 가운데에서 위로 짧은 세로선) */
 function hContact(x1,x2,type,o={}){
-  const a=x1+10, b=x2-10, m=(a+b)/2;
-  let s=L(x1,40,a,40)+L(b,40,x2,40);
-  if(type==='b') s+=L(a-4,43.3,b+4,43.3); else s+=L(a-4,33,b+4,33);
-  if(o.eocr) s+=L(m-5,38.3,m+5,48.3)+L(m-5,48.3,m+5,38.3);
-  if(o.pb){ const by=type==='b'?43.3:33; s+=L(m,by,m,29)+L(m-5,29,m+5,29); }
+  const a=x1+10, b=x2-10, m=(a+b)/2, by = type==='b' ? 43.3 : 33;
+  let s=L(x1,40,a,40)+L(b,40,x2,40)+L(a-2.6,by,b+2.6,by);
+  if(o.eocr) s+=L(m-2.6,by-2.6,m+2.6,by+2.6)+L(m-2.6,by+2.6,m+2.6,by-2.6);
+  if(o.pb) s+= type==='b' ? L(m,by,m,37.3) : L(m,by,m,by-6);
   s+=term(a,40)+term(b,40);
   if(o.label) s+=T_(m,22,o.label,'lbl c sm');
   return s;
