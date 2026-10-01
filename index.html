@@ -1,0 +1,1037 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>승강기기능사 실기 연습장</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+KR:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px);
+  padding-bottom:env(safe-area-inset-bottom,0px);
+  --bg:#E6EAED; --surface:#FFFFFF; --paper:#F7F9F8; --grid:#E3E9E7;
+  --ink:#1E2F3E; --ink-soft:#5A6A77; --line:#CBD3D9;
+  --steel:#CDD3D8; --steel-edge:#98A3AC; --duct:#B9C2C9; --part:#F3F5F6; --part-edge:#5F6D78; --screw:#EDF0F2;
+  --sel:#1C5FD4; --sel-bg:#E3ECFB;
+  --ok:#2B8A4B; --ok-bg:#E2F3E7; --bad:#C9322A; --bad-bg:#FBE5E3;
+  --w-R:#8A4B22; --w-S:#1A1A1A; --w-T:#8C949B; --w-PE:#2E9A4A; --w-ctrl:#E6B400; --w-ctrl-ink:#C39200;
+  --halo:rgba(20,30,40,.45);
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#0E141A; --surface:#161F27; --paper:#131C24; --grid:#1C2832;
+    --ink:#DCE6EE; --ink-soft:#91A1AE; --line:#2A3743;
+    --steel:#2A333C; --steel-edge:#3E4B56; --duct:#35414C; --part:#1D262E; --part-edge:#8A98A4; --screw:#2E3943;
+    --sel:#6EA1FF; --sel-bg:#172A4A;
+    --ok:#4CC074; --ok-bg:#14301E; --bad:#FF6B5E; --bad-bg:#3A1714;
+    --w-S:#050505; --w-ctrl-ink:#E6B400; --halo:rgba(230,236,240,.6);
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#0E141A; --surface:#161F27; --paper:#131C24; --grid:#1C2832;
+  --ink:#DCE6EE; --ink-soft:#91A1AE; --line:#2A3743;
+  --steel:#2A333C; --steel-edge:#3E4B56; --duct:#35414C; --part:#1D262E; --part-edge:#8A98A4; --screw:#2E3943;
+  --sel:#6EA1FF; --sel-bg:#172A4A;
+  --ok:#4CC074; --ok-bg:#14301E; --bad:#FF6B5E; --bad-bg:#3A1714;
+  --w-S:#050505; --w-ctrl-ink:#E6B400; --halo:rgba(230,236,240,.6);
+}
+*,*::before,*::after{box-sizing:inherit}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:var(--bg);color:var(--ink);
+  font-family:'IBM Plex Sans KR','Apple SD Gothic Neo','Malgun Gothic',system-ui,sans-serif;
+  font-size:15px;line-height:1.6;-webkit-font-smoothing:antialiased}
+button{font:inherit;color:inherit}
+.wrap{max-width:1560px;margin:0 auto;padding:20px 16px 40px}
+.top h1{margin:0;font-size:26px;line-height:1.25;font-weight:700;letter-spacing:-.01em}
+.top p{margin:4px 0 16px;color:var(--ink-soft);max-width:70ch}
+
+.problem{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:14px 18px;margin-bottom:14px}
+.problem h2{margin:0;font-size:17px;font-weight:700}
+.problem details{margin-top:6px}
+.problem summary{cursor:pointer;color:var(--sel);font-weight:600;width:max-content}
+.problem ul,.problem ol{margin:8px 0 4px;padding-left:22px;max-width:84ch}
+.problem li{margin:2px 0}
+.problem .ops{margin:8px 0 0;padding-left:22px;max-width:100ch;font-size:14px}
+.problem .ops li{margin:3px 0}
+.problem .note{margin:8px 0 0;font-size:13px;color:var(--ink-soft);max-width:100ch}
+
+.probs{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:12px}
+.probs-cap{font-size:13px;font-weight:600;color:var(--ink-soft);min-width:128px}
+.probs-list button:disabled{cursor:not-allowed;opacity:.45;border-style:dashed}
+.probs-list{display:flex;gap:6px;flex-wrap:wrap}
+.probs-list button{border:1px solid var(--line);background:var(--surface);border-radius:8px;padding:6px 12px;cursor:pointer;font-size:14px;font-weight:600;display:flex;align-items:center;gap:8px}
+.probs-list button .pn{display:inline-grid;place-items:center;min-width:24px;height:24px;border-radius:6px;background:var(--bg);font-size:13px}
+.probs-list button[aria-current="true"]{border-color:var(--ink);box-shadow:0 0 0 1px var(--ink) inset}
+.probs-list button[aria-current="true"] .pn{background:var(--ink);color:var(--surface)}
+.probs-list button .pt{font-weight:500;color:var(--ink-soft)}
+.steps{display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap}
+.steps button{display:flex;align-items:center;gap:10px;border:1px solid var(--line);background:var(--surface);
+  padding:10px 16px 10px 10px;border-radius:999px;cursor:pointer;font-weight:600}
+.steps .n{display:inline-grid;place-items:center;width:26px;height:26px;border-radius:50%;border:1.5px solid var(--ink);font-size:13px;font-weight:700}
+.steps .cnt{font-weight:500;font-size:13px;color:var(--ink-soft)}
+.steps button[aria-selected="true"]{background:var(--ink);color:var(--surface);border-color:var(--ink)}
+.steps button[aria-selected="true"] .n{border-color:var(--surface)}
+.steps button[aria-selected="true"] .cnt{color:inherit;opacity:.75}
+.steps button:focus-visible,.btn:focus-visible{outline:2px solid var(--sel);outline-offset:2px}
+
+.work{display:grid;grid-template-columns:minmax(0,1.75fr) minmax(0,1fr);gap:14px;align-items:start}
+.work.wire{grid-template-columns:minmax(0,1.15fr) minmax(0,1fr)}
+.work.big{grid-template-columns:1fr}
+@media (max-width:1180px){.work{grid-template-columns:1fr}}
+.pane{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:14px;min-width:0}
+.pane-bar{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:8px;margin-bottom:10px}
+.pane-bar h3{margin:0;font-size:15px;font-weight:700}
+.tools{display:flex;gap:6px;flex-wrap:wrap}
+.btn{border:1px solid var(--line);background:var(--surface);padding:6px 12px;border-radius:7px;cursor:pointer;font-size:14px;font-weight:500}
+.btn:hover{border-color:var(--ink-soft)}
+.btn.primary{background:var(--ink);color:var(--surface);border-color:var(--ink)}
+.scroll{overflow-x:auto;border-radius:6px;border:1px solid var(--line)}
+#sch{display:block;width:100%;min-width:860px;height:auto;background:var(--paper)}
+.status{margin:10px 2px 0;font-size:14px;color:var(--ink-soft);min-height:1.6em}
+.status b{color:var(--ink)} .status .good{color:var(--ok);font-weight:600}
+
+/* schematic */
+#sch text{font-family:inherit}
+#sch .sym line,#sch .sym path,#sch .sym rect,#sch .sym circle{stroke:var(--ink);stroke-width:1.5;fill:none}
+#sch .sym .fillp{fill:var(--paper)}
+#sch .sym .term{fill:var(--paper);stroke-width:1.2}
+#sch .sym .dash{stroke-dasharray:4 3;stroke-width:1.1}
+#sch .sym .lampYL{fill:rgba(230,180,0,.28)} #sch .sym .lampRL{fill:rgba(220,60,50,.2)} #sch .sym .lampGL{fill:rgba(40,160,80,.2)} #sch .sym .lampWL{fill:rgba(150,160,170,.18)}
+#sch .ext{stroke:var(--ink-soft);stroke-width:1.4;fill:none;stroke-dasharray:3 2}
+#sch .jn{fill:var(--ink)}
+#sch .lbl{fill:var(--ink);font-size:12px;font-weight:600;stroke:none}
+#sch .lbl.c{text-anchor:middle}
+#sch .lbl.sm{font-size:10px}
+#sch .tag{fill:var(--ink-soft);font-size:9.5px;font-weight:600}
+.w .vis{stroke:var(--ink);stroke-width:1.5;fill:none;stroke-linejoin:round}
+.w .hit{stroke:transparent;stroke-width:13;fill:none;stroke-linejoin:round}
+.mode-pins .w{pointer-events:none}
+.mode-wire .w{cursor:pointer}
+.mode-wire .w:hover .vis{stroke:var(--sel);stroke-width:3}
+.w.on .vis{stroke-width:3}
+.w.on.t-R .vis{stroke:var(--w-R)} .w.on.t-S .vis{stroke:var(--w-S)} .w.on.t-T .vis{stroke:var(--w-T)}
+.w.on.t-PE .vis{stroke:var(--w-PE)} .w.on.t-ctrl .vis{stroke:var(--w-ctrl-ink)}
+.w.hint .vis{stroke:var(--sel);stroke-width:3;stroke-dasharray:7 5;animation:march .8s linear infinite}
+.w.sel .vis{stroke:var(--sel);stroke-width:4.2;stroke-dasharray:none}
+@keyframes march{to{stroke-dashoffset:-12}}
+.slot{cursor:pointer;outline:none}
+.slot rect{fill:var(--surface);stroke:var(--ink-soft);stroke-width:1.1;stroke-dasharray:3 2}
+.slot text{font-size:11px;font-weight:700;text-anchor:middle;fill:var(--ink)}
+.slot:hover rect,.slot:focus-visible rect{stroke:var(--sel);stroke-dasharray:none;stroke-width:1.8}
+.slot.active rect{stroke:var(--sel);stroke-width:2.2;fill:var(--sel-bg);stroke-dasharray:none}
+.slot.ok rect{fill:var(--ok-bg);stroke:var(--ok);stroke-dasharray:none} .slot.ok text{fill:var(--ok)}
+.slot.bad rect{fill:var(--bad-bg);stroke:var(--bad);stroke-dasharray:none} .slot.bad text{fill:var(--bad)}
+.pinlbl{font-size:10.5px;font-weight:700;fill:#D0306A;text-anchor:middle}
+
+/* side cards */
+.card{border:1px solid var(--line);border-radius:8px;padding:12px 14px;margin-bottom:12px;background:var(--surface)}
+.card h4{margin:0 0 4px;font-size:15px}
+.card p{margin:4px 0;font-size:14px;max-width:66ch}
+.card .warn{color:var(--bad);font-weight:600}
+.card.now{border-left:4px solid var(--sel)}
+.refs{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+@media (max-width:520px){.refs{grid-template-columns:1fr}}
+.ref{border:1px solid var(--line);border-radius:8px;padding:10px 10px 8px}
+.ref.active{border-color:var(--sel);box-shadow:0 0 0 1px var(--sel) inset}
+.ref header{display:flex;justify-content:space-between;align-items:baseline;gap:6px;margin-bottom:6px}
+.ref h4{margin:0;font-size:14px} .ref header span{font-size:12px;color:var(--ink-soft)}
+.sock{width:100%;height:auto;display:block;margin:2px 0 6px;color:var(--ink)}
+.sock text{font-family:inherit}
+.sock .base{fill:var(--part);stroke:var(--part-edge);stroke-width:1.6}
+.sock .hole{fill:var(--paper);stroke:var(--part-edge);stroke-width:1.4}
+.sock .frame{fill:none;stroke:var(--part-edge);stroke-width:1.2}
+.sock .pn circle{fill:var(--surface);stroke:var(--ink);stroke-width:1.4}
+.sock .pn text{font-size:12px;font-weight:700;text-anchor:middle;fill:var(--ink)}
+.sock .pn.hl circle{fill:var(--sel);stroke:var(--sel)}
+.sock .pn.hl text{fill:#fff}
+.sock .it path,.sock .it line,.sock .it circle.c{fill:none;stroke:var(--c);stroke-width:1.8;stroke-linejoin:round}
+.sock .it .t{fill:var(--paper);stroke:var(--c);stroke-width:1.4}
+.sock .it text{fill:var(--c);font-size:10px;font-weight:700}
+.sock .it.on path,.sock .it.on line,.sock .it.on circle.c{stroke-width:3.4}
+.sock .it.on text{font-size:11px}
+.sock .ink{stroke:var(--ink);fill:none;stroke-width:1.4}
+.sock .sub{font-size:9.5px;fill:var(--ink-soft);text-anchor:middle}
+.sock .num{font-size:12px;font-weight:700;fill:var(--ink);text-anchor:middle}
+.strip{display:grid;gap:3px;margin:0 0 8px;font-size:11.5px;font-weight:700;text-align:center}
+.strip span{border:1px solid var(--line);border-radius:4px;padding:1px 0;background:var(--paper)}
+.strip span.hl{background:var(--sel);color:#fff;border-color:var(--sel)}
+.strip-cap{font-size:11.5px;color:var(--ink-soft);margin:0 0 3px}
+.ref .rnote{font-size:12px;color:var(--ink-soft);margin:4px 2px 0}
+.ref li i{display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:6px;vertical-align:1px}
+.ref ul{list-style:none;margin:0;padding:0;font-size:13px}
+.ref li{padding:2px 6px;border-radius:5px}
+.ref li b{font-weight:700;margin-right:5px}
+.ref li:hover{background:var(--sel-bg)}
+.ref li.on{background:var(--sel-bg);color:var(--sel);font-weight:600}
+
+/* panel */
+.panelwrap{overflow:auto;border-radius:6px}
+#panel{display:block;width:100%;height:auto;margin:0 auto}
+.work.big #panel{max-width:1000px}
+#panel text{font-family:inherit}
+.plate{fill:var(--steel);stroke:var(--steel-edge);stroke-width:.8}
+.duct{fill:var(--duct);opacity:.45}
+.part{fill:var(--part);stroke:var(--part-edge);stroke-width:.6}
+.ptxt{fill:var(--ink);font-size:8px;font-weight:700;text-anchor:middle;opacity:.55}
+.tbtxt{fill:var(--ink);font-size:3.5px;font-weight:600;text-anchor:middle}
+.tbsub{fill:var(--ink-soft);font-size:3.2px;text-anchor:middle}
+.tbdiv{stroke:var(--part-edge);stroke-width:.3}
+.pin circle{fill:var(--screw);stroke:var(--part-edge);stroke-width:.45}
+.pin text{font-size:3.3px;font-weight:700;text-anchor:middle;fill:var(--ink);pointer-events:none}
+.pin.blank circle{opacity:.35}
+.pin.hl circle{fill:var(--sel-bg);stroke:var(--sel);stroke-width:1}
+.pw{cursor:pointer}
+.pw .halo{stroke:var(--halo);fill:none;stroke-linejoin:round;stroke-linecap:round}
+.pw .core{fill:none;stroke-linejoin:round;stroke-linecap:round}
+.pw .stripe{fill:none;stroke:#E8C800;stroke-dasharray:1.6 1.6;stroke-linejoin:round}
+.pw.t-R .core{stroke:var(--w-R)} .pw.t-S .core{stroke:var(--w-S)} .pw.t-T .core{stroke:var(--w-T)}
+.pw.t-PE .core{stroke:var(--w-PE)} .pw.t-ctrl .core{stroke:var(--w-ctrl)}
+.has-sel .pw:not(.sel){opacity:.3}
+.pw.sel .halo{stroke:var(--sel)}
+.pw.fresh path{stroke-dasharray:1;stroke-dashoffset:1;animation:draw .8s ease-out forwards}
+.pw.fresh .stripe{stroke-dasharray:none}
+@keyframes draw{to{stroke-dashoffset:0}}
+.legend{display:flex;flex-wrap:wrap;gap:10px;font-size:12.5px;color:var(--ink-soft);align-items:center}
+.legend i{display:inline-block;width:18px;height:5px;border-radius:3px;vertical-align:middle;margin-right:5px;box-shadow:0 0 0 1px var(--halo)}
+.info .chip{display:inline-block;font-size:12px;padding:1px 8px;border-radius:999px;border:1px solid var(--line);color:var(--ink-soft);margin:2px 6px 4px 0}
+.info h4{font-size:17px}
+.info .row{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}
+.rules{font-size:13.5px;color:var(--ink-soft)}
+.rules ul{margin:4px 0 0;padding-left:18px}
+.rules li{margin:1px 0}
+.rules b{color:var(--ok)}
+
+/* keypad */
+.keypad{position:fixed;z-index:20;background:var(--surface);border:1px solid var(--line);border-radius:10px;
+  box-shadow:0 10px 30px rgba(0,0,0,.18);padding:10px;width:228px}
+.kp-head{font-size:13px;font-weight:700;margin-bottom:8px;display:flex;justify-content:space-between;gap:6px}
+.kp-head span{font-weight:500;color:var(--ink-soft)}
+.kp-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:6px}
+.kp-grid button,.kp-foot button{height:40px;border:1px solid var(--line);border-radius:7px;background:var(--paper);cursor:pointer;font-weight:700;font-size:15px}
+.kp-grid button:hover,.kp-grid button:focus-visible{border-color:var(--sel);background:var(--sel-bg);outline:none}
+.kp-foot{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:6px}
+.kp-foot button{font-size:13px;font-weight:600;height:34px}
+@media (prefers-reduced-motion:reduce){
+  .w.hint .vis{animation:none}
+  .pw.fresh path{animation:none;stroke-dashoffset:0}
+}
+:root{--w-main:#C9322A;--w-ctrl:#2563C9;--w-ctrl-ink:#2563C9}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){--w-main:#F0645A;--w-ctrl:#5B8FF0;--w-ctrl-ink:#7BA6F5}}
+:root[data-theme="dark"]{--w-main:#F0645A;--w-ctrl:#5B8FF0;--w-ctrl-ink:#7BA6F5}
+.w.on.t-main .vis{stroke:var(--w-main)}
+.pw.t-main .core{stroke:var(--w-main)}
+.pw.t-ctrl .core{stroke:var(--w-ctrl)}
+#panel .stub{stroke:var(--w-main);stroke-width:1.7;fill:none;opacity:.55;stroke-linecap:round}
+#panel .tblab{font-size:5.5px;font-weight:700;text-anchor:middle;fill:var(--ink-soft)}
+#panel .note{font-size:6.5px;fill:var(--ink-soft)}
+#panel .cbox{fill:#3A4148;stroke:#22282D;stroke-width:.8}
+#panel .lampc{stroke:#22282D;stroke-width:1.2;opacity:.92}
+#panel .pbring{fill:#CDD3D8;stroke:#22282D;stroke-width:.8}
+#panel .btxt{font-size:7px;font-weight:700;text-anchor:middle;fill:#fff}
+#panel .sockc{fill:none;stroke:var(--part-edge);stroke-width:.6;opacity:.6}
+#panel .sockk{fill:none;stroke:var(--part-edge);stroke-width:.6;opacity:.6}
+/* 와이어로프 그림 */
+#rope{display:block;width:100%;min-width:720px;height:auto;background:var(--paper)}
+#rope text{font-family:inherit}
+#rope .steelp{fill:var(--steel);stroke:var(--ink);stroke-width:2}
+#rope .hole2{fill:var(--paper);stroke:var(--ink);stroke-width:2}
+#rope .win{fill:var(--paper);stroke:var(--ink);stroke-width:2}
+#rope .petal{fill:#B9C2C9;stroke:var(--ink);stroke-width:1.4}
+#rope .ropebg{fill:#AEB7BF}
+#rope .ropeln{stroke:#5E6872;stroke-width:3}
+#rope .rope{stroke:var(--ink);stroke-width:2}
+#rope .bindw{fill:none;stroke:var(--ink-soft);stroke-width:2;stroke-dasharray:4 3}
+#rope .tagp{fill:#FFF6C8;stroke:var(--ink);stroke-width:1.6}
+#rope .tapep{fill:#2A2F35;stroke:var(--ink);stroke-width:1.6}
+#rope .lead{fill:none;stroke:var(--ink-soft);stroke-width:1.4}
+#rope .mark{fill:none;stroke:transparent;stroke-width:3}
+#rope .dimln{fill:none;stroke:var(--ink-soft);stroke-width:1.6}
+#rope .ct{fill:var(--ink);font-size:14px;font-weight:600}
+#rope .ct.m{text-anchor:middle} #rope .ct.e{text-anchor:start}
+#rope .ct.sub{font-size:12px;font-weight:500;fill:var(--ink-soft)}
+#rope .ct.sm{font-size:12px}
+#rope .call.on .ct{fill:var(--sel)}
+#rope .call.on .lead,#rope .call.on .dimln{stroke:var(--sel);stroke-width:2.4}
+#rope .call.on .mark{stroke:var(--sel);stroke-dasharray:6 4}
+#rope .call.on .petal,#rope .call.on .tagp{stroke:var(--sel);stroke-width:2.4}
+#rope .call.on .bindw{stroke:var(--sel);stroke-width:3}
+#rope .call.on .tapep{stroke:var(--sel);stroke-width:3}
+/* 점검 문제 */
+.qg{margin:14px 0 6px;font-size:14px;color:var(--ink-soft)}
+.qcard{border:1px solid var(--line);border-radius:8px;padding:10px 12px;margin-bottom:8px;background:var(--surface);cursor:pointer}
+.qcard.cur{border-color:var(--sel);box-shadow:0 0 0 1px var(--sel) inset}
+.qcard.ok{border-left:4px solid var(--ok)} .qcard.bad{border-left:4px solid var(--bad)}
+.qq{margin:0 0 8px;font-weight:600;font-size:14.5px}
+.opts{display:grid;gap:5px}
+.opt{text-align:left;border:1px solid var(--line);background:var(--paper);border-radius:7px;padding:7px 10px;cursor:pointer;font-size:14px}
+.opt:hover:not(:disabled){border-color:var(--sel);background:var(--sel-bg)}
+.opt:disabled{cursor:default}
+.opt.right{border-color:var(--ok);background:var(--ok-bg);color:var(--ok);font-weight:600}
+.opt.wrong{border-color:var(--bad);background:var(--bad-bg);color:var(--bad)}
+.qex{margin:8px 0 0;font-size:13.5px;color:var(--ink-soft)}
+.qex b{color:var(--ink)}
+.opt:focus-visible,.qcard:focus-visible{outline:2px solid var(--sel);outline-offset:2px}
+
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <div style="display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:10px">
+      <h1>승강기기능사 실기 연습장</h1>
+      <button class="btn" id="resetAll" title="이 브라우저에 저장된 내 진도를 모두 지웁니다">처음부터 다시 하기</button>
+    </div>
+    <p>공개문제 도면에 핀번호를 적어 보고, 도면의 선을 눌러 주어진 제어판에 실제 작업처럼 배선해 보세요. 와이어로프 작업 요구사항도 문제로 점검할 수 있어요.</p>
+  </header>
+
+  <nav class="probs" aria-label="공개문제 선택">
+    <span class="probs-cap">공개문제</span>
+    <div id="probList" class="probs-list"></div>
+  </nav>
+  <section class="problem">
+    <h2 id="probTitle"></h2>
+    <ol class="ops" id="ops"></ol>
+  </section>
+
+  <nav class="steps" role="tablist" aria-label="연습 단계">
+    <button role="tab" data-mode="pins"><span class="n">1</span>핀번호 넣기<span class="cnt" id="cnt-pins"></span></button>
+    <button role="tab" data-mode="wire"><span class="n">2</span>제어판 배선<span class="cnt" id="cnt-wire"></span></button>
+    <button role="tab" data-mode="rope"><span class="n">3</span>요구사항 점검<span class="cnt" id="cnt-rope"></span></button>
+  </nav>
+
+  <div class="work" id="work">
+    <section class="pane">
+      <div class="pane-bar"><h3 id="leftTitle">시퀀스 도면</h3><div class="tools" id="tools"></div></div>
+      <div class="scroll" id="schWrap"><svg id="sch" viewBox="0 0 840 560" role="img" aria-label="시퀀스 도면"></svg></div>
+      <div class="scroll" id="ropeWrap" hidden><svg id="rope" viewBox="0 40 900 300" role="img" aria-label="와이어로프 끝부분 처리 완성 모습"></svg></div>
+      <p class="status" id="status" aria-live="polite"></p>
+    </section>
+    <section class="pane" id="side"></section>
+  </div>
+</div>
+<div id="keypad" class="keypad" hidden role="dialog" aria-label="핀번호 선택"></div>
+
+<script>
+const $ = s => document.querySelector(s);
+const circ = n => (typeof n === 'number' && n >= 1 && n <= 20) ? String.fromCharCode(0x2460 + n - 1) : String(n);
+
+/* ================= 기구 내부결선도 (공개문제 공통) ================= */
+const R12=[[1,2,3,4,5,6],[7,8,9,10,11,12]], R8=[[6,5,4,3],[7,8,1,2]];
+const REF = {
+  EOCR:{title:'EOCR', kind:'12핀', rows:R12, items:[['전원',6,12],['주회로 L1',1,7],['주회로 L2',2,8],['주회로 L3',3,9],['b접점 (정상 시 닫힘)',10,4],['a접점 (트립 시 닫힘)',10,5]], note:'⑩(95)과 ⑪(97)은 기구 안에서 이어져 있어서, a접점 공통으로 ⑪을 써도 같은 회로가 됩니다.'},
+  MC:{title:'MC1 · MC2 전자접촉기', kind:'12핀', rows:R12, items:[['코일',6,12],['주접점 L1',1,7],['주접점 L2',2,8],['주접점 L3',3,9],['보조 a접점',4,10],['보조 b접점',5,11]]},
+  X:{title:'릴레이', kind:'8핀', rows:R8, items:[['코일',2,7],['a접점',1,3],['b접점',1,4],['a접점',8,6],['b접점',8,5]]},
+  T:{title:'T 타이머', kind:'8핀', rows:R8, items:[['코일',2,7],['순시 a접점',1,3],['한시 a접점',8,6],['한시 b접점',8,5]]},
+  FR:{title:'FR 플리커 릴레이', kind:'8핀', rows:R8, items:[['코일 (전원)',2,7],['a접점',8,6],['b접점',8,5]]}
+};
+const REF_OF = {EOCR:'EOCR',MC1:'MC',MC2:'MC',T:'T',T1:'T',T2:'T',FR:'FR',X:'X'};
+const COMP_MAX = {EOCR:12,MC1:12,MC2:12,T:8,T1:8,T2:8,FR:8,X:8};
+
+/* ================= 공개문제 목록 ================= */
+const PROBLEMS=[
+  {no:1,short:'T1 정·역 전환',ready:true},
+  {no:2,short:'',ready:false},{no:3,short:'',ready:false},{no:4,short:'',ready:false},{no:5,short:'',ready:false},
+  {no:6,short:'',ready:false},{no:7,short:'',ready:false},{no:8,short:'',ready:false},{no:9,short:'',ready:false},{no:10,short:'',ready:false}
+];
+const CUR_PROB=(()=>{ const m=location.hash.match(/p(\d+)/); const v=m?+m[1]:1; return PROBLEMS.some(p=>p.no===v&&p.ready)?v:1; })();
+
+/* ================= 1단계: 핀번호 칸 ================= */
+const V = (x,y1,y2) => [[x-16,y1+8],[x-16,y2-8]];   // 세로 접점 옆 칸
+const C = (x) => [[x-15,433],[x-15,487]];             // 코일 위·아래 칸
+const EL_MAIN = {
+  EO_R:{comp:'EOCR',name:'EOCR 주회로 (L1)',ans:[1,7],exact:true,slots:[[26,100],[26,150]]},
+  EO_S:{comp:'EOCR',name:'EOCR 주회로 (L2)',ans:[2,8],exact:true,slots:[[66,100],[66,150]]},
+  EO_T:{comp:'EOCR',name:'EOCR 주회로 (L3)',ans:[3,9],exact:true,slots:[[106,100],[106,150]]},
+  M1_R:{comp:'MC1',name:'MC1 주접점 (L1)',ans:[1,7],exact:true,slots:[[24,228],[24,252]]},
+  M1_S:{comp:'MC1',name:'MC1 주접점 (L2)',ans:[2,8],exact:true,slots:[[64,228],[64,252]]},
+  M1_T:{comp:'MC1',name:'MC1 주접점 (L3)',ans:[3,9],exact:true,slots:[[104,228],[104,252]]},
+  M2_R:{comp:'MC2',name:'MC2 주접점 (L1 입력)',ans:[1,7],exact:true,slots:[[174,228],[174,252]]},
+  M2_S:{comp:'MC2',name:'MC2 주접점 (L2 입력)',ans:[2,8],exact:true,slots:[[214,228],[214,252]]},
+  M2_T:{comp:'MC2',name:'MC2 주접점 (L3 입력)',ans:[3,9],exact:true,slots:[[254,228],[254,252]]}
+};
+
+/* ---------- 공개문제 1 : 도면 좌표 ---------- */
+const P1 = (()=>{
+  const Px=300, Nx=315, EP=330, EA=390, YLx=445, EB1=400, EB2=450, PB1x=465, PB2x=505, S=540, TS=612, M2=672, RLx=732, GLx=792;
+  const EL = {
+    EO_P:{comp:'EOCR',name:'EOCR 전원',ans:[6,12],slots:C(EP)},
+    EO_B:{comp:'EOCR',name:'EOCR b접점 (윗줄 전원선)',ans:[10,4],alt:[[11,4]],slots:[[EB1+10,56],[EB2-10,56]]},
+    EO_A:{comp:'EOCR',name:'EOCR a접점 (경보)',ans:[10,5],alt:[[11,5]],slots:V(EA,110,150)},
+    T2_C:{comp:'T2',name:'T2 코일',ans:[2,7],slots:C(EA)},
+    T2_B:{comp:'T2',name:'T2 한시 b접점 (YL)',ans:[8,5],slots:V(YLx,290,330)},
+    T1_I:{comp:'T1',name:'T1 순시 a접점 (자기유지)',ans:[1,3],slots:V(TS,70,110)},
+    T1_C:{comp:'T1',name:'T1 코일',ans:[2,7],slots:C(TS)},
+    T1_B:{comp:'T1',name:'T1 한시 b접점 (MC1 쪽)',ans:[8,5],slots:V(S,200,240)},
+    T1_A:{comp:'T1',name:'T1 한시 a접점 (MC2 쪽)',ans:[8,6],slots:V(M2,200,240)},
+    M2_B:{comp:'MC2',name:'MC2 보조 b접점 (인터록)',ans:[5,11],slots:V(S,290,330)},
+    M1_C:{comp:'MC1',name:'MC1 코일',ans:[6,12],slots:C(S)},
+    M1_B:{comp:'MC1',name:'MC1 보조 b접점 (인터록)',ans:[5,11],slots:V(M2,290,330)},
+    M2_C:{comp:'MC2',name:'MC2 코일',ans:[6,12],slots:C(M2)},
+    M1_A:{comp:'MC1',name:'MC1 보조 a접점 (RL)',ans:[4,10],slots:V(RLx,70,110)},
+    M2_A:{comp:'MC2',name:'MC2 보조 a접점 (GL)',ans:[4,10],slots:V(GLx,70,110)}
+  };
+  const N_NOTE='L3 쪽 공통선입니다. 한 단자에 2가닥을 넘지 않도록 옆 기구로 건너가며 차례로 이어요.';
+  const WIRES = [
+    {id:'m1',a:'TBL-L1',b:'EOCR-1',type:'main',d:['M40 30 V110'],note:'전원 단자대 L1을 EOCR ①로 보냅니다. MCCB는 생략하고 직결해요.'},
+    {id:'m2',a:'TBL-L2',b:'EOCR-2',type:'main',d:['M80 30 V110']},
+    {id:'m3',a:'TBL-L3',b:'EOCR-3',type:'main',d:['M120 30 V110']},
+    {id:'m4',a:'EOCR-7',b:'MC1-1',type:'main',d:['M40 140 V220']},
+    {id:'m5',a:'EOCR-8',b:'MC1-2',type:'main',d:['M80 140 V220']},
+    {id:'m6',a:'EOCR-9',b:'MC1-3',type:'main',d:['M120 140 V220']},
+    {id:'m7',a:'MC1-1',b:'MC2-1',type:'main',d:['M40 180 H190 V220'],note:'EOCR 출력을 MC1 입력에서 MC2 입력으로 같은 상끼리 건너 연결합니다.'},
+    {id:'m8',a:'MC1-2',b:'MC2-2',type:'main',d:['M80 190 H230 V220'],note:'EOCR 출력을 MC1 입력에서 MC2 입력으로 같은 상끼리 건너 연결합니다.'},
+    {id:'m9',a:'MC1-3',b:'MC2-3',type:'main',d:['M120 200 H270 V220'],note:'EOCR 출력을 MC1 입력에서 MC2 입력으로 같은 상끼리 건너 연결합니다.'},
+    {id:'m10',a:'MC1-7',b:'TBM-U',type:'main',d:['M40 260 V330']},
+    {id:'m11',a:'MC1-8',b:'TBM-V',type:'main',d:['M80 260 V330']},
+    {id:'m12',a:'MC1-9',b:'TBM-W',type:'main',d:['M120 260 V330']},
+    {id:'m13',a:'MC2-7',b:'TBM-W',type:'main',d:['M190 260 V290 H120'],note:'역회전을 위해 MC2 출력은 상을 바꿔 연결합니다. MC2 ⑦(L1 쪽)이 W로 갑니다.'},
+    {id:'m14',a:'MC2-8',b:'TBM-V',type:'main',d:['M230 260 V300 H80'],note:'L2는 그대로 V로 갑니다.'},
+    {id:'m15',a:'MC2-9',b:'TBM-U',type:'main',d:['M270 260 V310 H40'],note:'MC2 ⑨(L3 쪽)가 U로 갑니다. L1과 L3가 바뀌어 전동기가 반대로 돕니다.'},
+    {id:'p1',a:'EOCR-1',b:'EOCR-6',type:'ctrl',d:[`M40 70 H${Px} V40 H${EP} V444`],note:'EOCR 앞단(L1)에서 제어 전원을 따서 EOCR 전원 ⑥으로 보냅니다. EOCR ①에는 주회로선과 이 선, 2가닥이 물려요.'},
+    {id:'p2',a:'EOCR-6',b:'EOCR-10',type:'ctrl',d:[`M${EP} 40 H${EB1}`,`M${EP} 100 H${EA} V110`],note:'EOCR 접점 공통 ⑩을 전원선에 묶습니다. 도면의 b접점(⑩-④)과 a접점(⑩-⑤)은 같은 ⑩번 단자를 씁니다.'},
+    {id:'q1',a:'EOCR-4',b:'PB0-b1',type:'ctrl',d:[`M${EB2} 40 H${PB1x}`],note:'EOCR b접점을 지난 전원을 정지 버튼 PB0의 b접점으로 보냅니다.'},
+    {id:'q2',a:'PB0-b2',b:'PB1-a1',type:'ctrl',d:[`M${PB2x} 40 H${S} V70`],note:'PB0 b접점 출력을 PB1 a접점 입력에 잇습니다. 둘 다 같은 컨트롤 박스 안이라 함 안에서 짧게 건넙니다.'},
+    {id:'q3',a:'PB1-a1',b:'T1-1',type:'ctrl',d:[`M${S} 40 H${TS} V70`],note:'같은 윗줄 전원을 T1 순시 a접점 ①로 보내 자기유지 회로를 만듭니다.'},
+    {id:'q4',a:'T1-1',b:'MC1-4',type:'ctrl',d:[`M${TS} 40 H${RLx} V70`],note:'RL용 MC1 보조 a접점 ④도 같은 전원선에서 받습니다.'},
+    {id:'q5',a:'MC1-4',b:'MC2-4',type:'ctrl',d:[`M${RLx} 40 H${GLx} V70`],note:'MC1 ④에서 MC2 ④로 건너 연결합니다.'},
+    {id:'c1',a:'PB1-a2',b:'T1-3',type:'ctrl',d:[`M${S} 110 V130 H${TS} V110`],note:'PB1 출력과 T1 순시 a접점 출력 ③을 한 점으로 묶습니다. PB1을 놓아도 T1이 스스로 전원을 유지해요.'},
+    {id:'c2',a:'T1-3',b:'T1-8',type:'ctrl',d:[`M${S} 130 V200`],note:'자기유지된 전원을 T1 한시 접점 공통 ⑧로 보냅니다. 같은 소켓 안 점퍼예요.'},
+    {id:'c3',a:'T1-8',b:'T1-2',type:'ctrl',d:[`M${S} 160 H${M2} V200`,`M${S} 160 H${TS} V444`],note:'T1 코일 ②도 같은 점에서 받습니다. 한시 b(⑧-⑤)와 한시 a(⑧-⑥)는 공통 ⑧을 함께 써요.'},
+    {id:'d1',a:'T1-5',b:'MC2-5',type:'ctrl',d:[`M${S} 240 V290`],note:'T1 한시 b접점 출력을 MC2 보조 b접점(인터록)으로 보냅니다.'},
+    {id:'d2',a:'MC2-11',b:'MC1-6',type:'ctrl',d:[`M${S} 330 V444`],note:'MC2가 쉬고 있을 때만 MC1 코일에 전원이 들어갑니다.'},
+    {id:'e1',a:'T1-6',b:'MC1-5',type:'ctrl',d:[`M${M2} 240 V290`],note:'T1 한시 a접점 출력을 MC1 보조 b접점(인터록)으로 보냅니다.'},
+    {id:'e2',a:'MC1-11',b:'MC2-6',type:'ctrl',d:[`M${M2} 330 V444`],note:'MC1이 쉬고 있을 때만 MC2 코일에 전원이 들어갑니다.'},
+    {id:'r1',a:'MC1-10',b:'RL-1',type:'ctrl',d:[`M${RLx} 110 V444`],note:'MC1이 동작하면 보조 a접점이 닫혀 RL이 켜집니다.'},
+    {id:'g1',a:'MC2-10',b:'GL-1',type:'ctrl',d:[`M${GLx} 110 V444`],note:'MC2가 동작하면 보조 a접점이 닫혀 GL이 켜집니다.'},
+    {id:'a1',a:'EOCR-5',b:'T2-2',type:'ctrl',d:[`M${EA} 150 V444`],note:'과부하로 EOCR이 트립하면 ⑩-⑤가 닫혀 T2 코일에 전원이 들어갑니다.'},
+    {id:'a2',a:'T2-2',b:'T2-8',type:'ctrl',d:[`M${EA} 200 H${YLx} V290`],note:'T2 한시 b접점 공통 ⑧도 같은 점에서 받습니다. 같은 소켓 안 점퍼예요.'},
+    {id:'y1',a:'T2-5',b:'YL-1',type:'ctrl',d:[`M${YLx} 330 V444`],note:'트립 직후부터 T2 설정 시간 동안 YL이 켜졌다가, 시간이 지나면 한시 b접점이 열려 꺼집니다.'},
+    {id:'n1',a:'EOCR-3',b:'EOCR-12',type:'ctrl',d:[`M120 85 H${Nx} V530 H${EP} V476`],note:'EOCR 앞단(L3)에서 제어회로 공통선을 따서 EOCR ⑫로 보냅니다.'},
+    {id:'n2',a:'EOCR-12',b:'T2-7',type:'ctrl',d:[`M${EP} 530 H${EA} V476`],note:N_NOTE},
+    {id:'n3',a:'T2-7',b:'YL-2',type:'ctrl',d:[`M${EA} 530 H${YLx} V476`],note:N_NOTE},
+    {id:'n4',a:'YL-2',b:'MC1-12',type:'ctrl',d:[`M${YLx} 530 H${S} V476`],note:N_NOTE},
+    {id:'n5',a:'MC1-12',b:'T1-7',type:'ctrl',d:[`M${S} 530 H${TS} V476`],note:N_NOTE},
+    {id:'n6',a:'T1-7',b:'MC2-12',type:'ctrl',d:[`M${TS} 530 H${M2} V476`],note:N_NOTE},
+    {id:'n7',a:'MC2-12',b:'RL-2',type:'ctrl',d:[`M${M2} 530 H${RLx} V476`],note:N_NOTE},
+    {id:'n8',a:'RL-2',b:'GL-2',type:'ctrl',d:[`M${RLx} 530 H${GLx} V476`],note:'RL과 GL은 같은 램프 박스 안이라 공통선을 함 안에서 건너 줍니다.'}
+  ];
+  const sym = ()=>{
+    let s='';
+    s+=`<rect class="fillp" x="${EP-12}" y="444" width="24" height="32" rx="2"/>`+T_(EP,464,'EOCR','tag" text-anchor="middle')+term(EP,444)+term(EP,476);
+    s+=hContact(EB1,EB2,'b',{eocr:1,label:'EOCR'});
+    s+=hContact(PB1x,PB2x,'b',{pb:1,label:'PB0'});
+    s+=contact(EA,110,150,'a',{label:'EOCR',eocr:1});
+    s+=coil(EA,'T2');
+    s+=contact(YLx,290,330,'b',{label:'T2',timer:1});
+    s+=lamp(YLx,'YL');
+    s+=contact(S,70,110,'a',{pb:1,label:'PB1',lx:22});
+    s+=contact(TS,70,110,'a',{label:'T1'});
+    s+=contact(S,200,240,'b',{label:'T1',timer:1});
+    s+=contact(M2,200,240,'a',{label:'T1',timer:1,lx:22});
+    s+=coil(TS,'T1');
+    s+=contact(S,290,330,'b',{label:'MC2'})+contact(M2,290,330,'b',{label:'MC1'});
+    s+=coil(S,'MC1',true)+coil(M2,'MC2',true);
+    s+=contact(RLx,70,110,'a',{label:'MC1'})+contact(GLx,70,110,'a',{label:'MC2'});
+    s+=lamp(RLx,'RL')+lamp(GLx,'GL');
+    return s;
+  };
+  const JN=[[40,70],[120,85],[40,180],[80,190],[120,200],[120,290],[80,300],[40,310],
+    [EP,40],[EP,100],[S,40],[TS,40],[RLx,40],[EA,200],[S,130],[S,160],[TS,160],
+    [EP,530],[EA,530],[YLx,530],[S,530],[TS,530],[M2,530],[RLx,530]];
+  /* 제어판 (보통합판 600 × 400, 기구 배치도 기준) */
+  const LAYOUT = {
+    TBL:{x:40,y:50,label:'L1 L2 L3'},
+    TBM:{x:40,y:292,label:'U V W'},
+    LAMPS:{x:350,y:38,order:['RL','GL','YL']},
+    PBS:{x:420,y:290,order:['PB0','PB1']},
+    SOCKETS:['EOCR','MC1','MC2','T1','T2']
+  };
+  const OPS=`<li><b>전원</b>: 3상 220V 중 EOCR 앞단의 L1·L3에서 제어 전원(AC 220V)을 받습니다. EOCR은 ⑥-⑫로 전원을 받아 전류를 감시합니다.</li>
+<li><b>기동</b>: PB1을 누르면 T1 코일이 여자되고 T1 순시 a접점(①-③)으로 자기유지됩니다. 동시에 T1 한시 b접점과 MC2 b접점을 거쳐 MC1이 여자되어 전동기가 정회전하고 RL이 켜집니다.</li>
+<li><b>전환</b>: T1 설정 시간이 지나면 한시 b접점이 열려 MC1이 꺼지고(RL 소등), 한시 a접점이 닫혀 MC1 b접점을 거쳐 MC2가 여자됩니다. MC2는 L1과 L3를 바꿔 넣으므로 전동기가 역회전하고 GL이 켜집니다.</li>
+<li><b>정지</b>: PB0을 누르면 T1의 자기유지가 풀려 MC1·MC2·램프가 모두 꺼집니다.</li>
+<li><b>과부하</b>: EOCR이 트립하면 b접점(⑩-④)이 열려 운전 회로 전체가 끊기고, a접점(⑩-⑤)이 닫혀 T2가 여자되며 YL이 켜집니다. T2 설정 시간이 지나면 T2 한시 b접점이 열려 YL이 꺼집니다.</li>
+<li><b>인터록</b>: MC1·MC2의 보조 b접점이 서로의 코일 회로에 들어 있어 두 접촉기가 동시에 들어가지 않습니다.</li>`;
+  return {title:'타이머(T1)에 의한 전동기 정·역 자동 전환과 과부하 경보(T2·YL)',W:840,EL,WIRES,sym,JN,LAYOUT,OPS};
+})();
+
+const PD = ({1:P1})[CUR_PROB];
+const EL = Object.assign({}, EL_MAIN, PD.EL);
+const EL_IDS = Object.keys(EL);
+const TOTAL_SLOTS = EL_IDS.reduce((n,id)=>n+EL[id].ans.length,0);
+const WIRES = PD.WIRES;
+const TYPE_NAME = {main:'주회로 · 2.5㎟ 적색 · 압착단자+절연튜브', ctrl:'보조회로 · 1.5㎟ 청색 · 나선 직결'};
+
+/* ================= 3단계: 요구사항 점검 ================= */
+const QUIZ = [
+  {id:'q_order',g:'공통',ref:null,q:'두 과제를 어떤 순서로 하나요?',o:['제어회로를 먼저 구성하고 와이어로프 작업을 한다','와이어로프 작업을 먼저 해서 제출한 뒤 제어회로를 구성한다','두 작업을 번갈아 가며 한다','순서는 자유다'],a:1,ex:'요구사항 가: 와이어로프 끝부분 처리작업을 먼저 시작해 작품을 제출한 후에 승강기 운전 제어회로를 구성합니다.'},
+  {id:'q_bend',g:'와이어로프',ref:'bend',q:'와이어로프의 구부러진 부위는 로프 소켓 입구(끝)와 비교해 어디에 있어야 하나요?',o:['입구보다 약간 튀어나오게','입구와 정확히 같은 높이로','입구보다 5mm 이상 안쪽으로','소켓 밖으로 20mm 이상'],a:0,ex:'요구사항 나-1): 구부러진 부위가 로프 소켓의 입구(끝)보다 약간 튀어나오게 작업합니다.'},
+  {id:'q_flower',g:'와이어로프',ref:'flower',q:'꼬임 모양은 어떻게 만들고, 어디까지 틀리면 실격인가요?',o:['나선형, 절반 이상 다르면 실격','국화꽃 모양, 1/3 이상 모양이 같지 않으면 실격','국화꽃 모양, 모양은 채점하지 않음','일자형, 한 가닥이라도 다르면 실격'],a:1,ex:'요구사항 나-2)와 실격 기준: 국화꽃 모양으로 작업하며, 1/3 이상 모양이 같지 않으면 실격입니다.'},
+  {id:'q_bind',g:'와이어로프',ref:'bind',q:'바인드선 작업이 끝난 뒤 바인드선은 어떻게 보여야 하나요?',o:['소켓 밖에서 잘 보이도록','소켓에 가려져 보이지 않게','소켓 입구에 절반쯤 걸치게','바인드선은 감지 않아도 된다'],a:1,ex:'요구사항 나-3): 꼬임이 풀리지 않도록 바인드선을 감되, 소켓에 가려져 보이지 않아야 합니다. 바인드 작업을 하지 않으면 실격이에요.'},
+  {id:'q_tip',g:'와이어로프',ref:'tip',q:'완전히 잡아넣었을 때 끝부분은 소켓 양옆의 개방된 곳보다 얼마가 되어야 하나요?',o:['0mm 이상 5mm 미만','5mm 이상 10mm 이하','10mm 이상 15mm 이하','20mm 정도'],a:1,ex:'요구사항 나-4): 소켓 양옆의 개방된 곳보다 5mm 이상 10mm 이하가 되도록 작업합니다.'},
+  {id:'q_tool',g:'와이어로프',ref:'head',q:'와이어소켓 머리 부분을 두들겨 더 들어가지 않게 할 때 쓸 수 있는 공구는?',o:['쇠망치','펜치 손잡이','고무 또는 나무망치','어떤 공구든 상관없다'],a:2,ex:'요구사항 나-5): 끝부분을 손으로 잡고 고무 또는 나무망치로 두들깁니다. 그 밖의 금속류 공구는 금지예요.'},
+  {id:'q_tag',g:'와이어로프',ref:'tag',q:'비번호는 어디에 어떻게 붙이나요?',o:['소켓 머리에 매직으로 쓴다','견출지에 써서 로프 나머지 중단 부분에 스카치테이프로 붙인다','로프 끝에 비닐테이프로 감아 붙인다','감독위원에게 말로 알린다'],a:1,ex:'요구사항 나-6): 견출지에 비번호를 써서 와이어로프 나머지 중단 부분에 스카치테이프로 부착합니다.'},
+  {id:'q_end',g:'와이어로프',ref:'end',q:'와이어로프의 나머지 끝부분은 어떻게 처리하나요?',o:['그대로 둔다','풀어지지 않도록 비닐테이프로 감는다','바인드선으로 감는다','잘라서 제출한다'],a:1,ex:'요구사항 나-7): 나머지 끝부분은 풀어지지 않도록 비닐테이프로 감아 처리합니다.'},
+  {id:'q_wire',g:'제어회로',ref:null,q:'주회로와 보조회로 전선은 각각 무엇을 쓰나요?',o:['주회로 1.5㎟ 청색, 보조회로 2.5㎟ 적색','주회로 2.5㎟ 적색, 보조회로 1.5㎟ 청색','둘 다 2.5㎟ 적색','둘 다 1.5㎟ 청색'],a:1,ex:'요구사항 다-5): 주회로는 2.5㎟(7/0.67) 적색, 보조회로는 1.5㎟(1/1.38) 청색입니다. 굵기나 색이 다르면 실격이에요.'},
+  {id:'q_term',g:'제어회로',ref:null,q:'보조회로 전선은 단자에 어떻게 결선하나요?',o:['압착단자와 절연튜브를 끼워서','피복을 벗긴 나선을 직접, 나선이 2mm 이상 보이지 않게','납땜해서','피복째로 물린다'],a:1,ex:'요구사항 다-6), 7): 주회로는 압착단자+절연튜브, 보조회로는 나선을 직접 물립니다. 나선이 2mm 이상 보이거나 피복이 단자에 물리면 안 됩니다.'},
+  {id:'q_three',g:'제어회로',ref:null,q:'한 단자에 접속할 수 있는 전선은 최대 몇 가닥인가요?',o:['1가닥','2가닥','3가닥','제한 없음'],a:1,ex:'3가닥 이상 접속은 금지이고, 실격 사항입니다. 그래서 같은 점은 옆 기구로 건너가며(점퍼) 이어 갑니다.'},
+  {id:'q_route',g:'제어회로',ref:null,q:'제어판 배선에서 금지되는 것은?',o:['수평·수직 노출 배선','케이블타이로 묶기','기구와 기구 사이로 지나가는 배선','단자대를 거치는 배선'],a:2,ex:'요구사항 다-4): 전면 노출 배선(수평·수직)에 케이블타이로 정리하되, 기구와 기구 사이의 배선은 금지입니다. 기구 사이로 수직 배선하면 실격이에요.'},
+  {id:'q_socket',g:'제어회로',ref:null,q:'소켓(베이스)은 어느 방향으로 고정하나요?',o:['홈이 위로','홈이 아래로','홈이 왼쪽으로','방향은 상관없다'],a:1,ex:'수험자 유의사항 3): 부품 내부결선도와 구성도를 참고해 홈이 아래로 향하도록 배치하고, 소켓 번호에 유의합니다.'},
+  {id:'q_8p',g:'제어회로',ref:null,q:'타이머·릴레이·플리커릴레이처럼 8P 소켓을 쓰는 기구는?',o:['기구마다 전용 소켓을 따로 쓴다','기구 구분 없이 지급된 8P 소켓을 똑같이 쓴다','11P 소켓으로 바꿔 쓴다','소켓 없이 직접 배선한다'],a:1,ex:'수험자 유의사항 4): 기구의 구분 없이 지급된 8P 소켓을 모두 동일하게 적용합니다.'},
+  {id:'q_supply',g:'제어회로',ref:null,q:'전원 측 전선은 어떻게 해 두나요?',o:['단자대에서 잘라 둔다','약 100mm 인출하고 끝에서 약 10mm 피복을 벗겨 둔다','약 300mm 인출하고 피복은 그대로 둔다','플러그를 달아 둔다'],a:1,ex:'요구사항 다-9): 전원 측 전선은 약 100mm 정도 인출하고 피복은 끝에서 약 10mm 정도 벗겨 놓습니다.'},
+  {id:'q_test',g:'제어회로',ref:null,q:'시험 중 배선 점검은 어떻게 하나요?',o:['전원을 넣어 직접 동작시켜 본다','회로시험기(멀티테스터)나 벨시험기로만 한다','감독위원에게 전원을 넣어 달라고 한다','점검할 수 없다'],a:1,ex:'수험자 유의사항 2): 기기는 채점용이라 수험자가 전원을 넣을 수 없고, 회로시험기나 벨시험기로만 점검합니다.'}
+];
+
+
+/* ================= 도면 기호 ================= */
+const L=(x1,y1,x2,y2,c)=>`<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}"${c?` class="${c}"`:''}/>`;
+const term=(x,y)=>`<circle class="term" cx="${x}" cy="${y}" r="2.3"/>`;
+const T_=(x,y,s,c='lbl')=>`<text class="${c}" x="${x}" y="${y}">${s}</text>`;
+/* 제어회로 접점: 공개문제 도면 방식 (단자 o o + 막대. a: 오른쪽에 떨어진 막대 / b: 왼쪽에 닿은 막대) */
+function contact(x,y1,y2,type,o={}){
+  const st=Math.min(10,(y2-y1)/4), t1=y1+st, t2=y2-st, my=(t1+t2)/2, isA=type==='a';
+  const bx = isA ? x+7 : x-3.3, out = isA ? 1 : -1;
+  let s=L(x,y1,x,t1)+L(x,t2,x,y2)+L(bx,t1-4,bx,t2+4);
+  if(o.pb) s+=L(bx,my,bx+8*out,my);
+  if(o.timer){ const tx = isA ? bx : x+2.5; s+=`<path d="M${tx} ${my-6} L${tx+9} ${my} L${tx} ${my+6}"/>`; }
+  if(o.flicker) s+=`<path d="M${bx-8} ${my} L${bx} ${my-3.6} L${bx+8} ${my} L${bx} ${my+3.6} Z" style="fill:var(--ink)"/>`;
+  if(o.eocr) s+=L(bx-5,my-5,bx+5,my+5)+L(bx-5,my+5,bx+5,my-5);
+  s+=term(x,t1)+term(x,t2);
+  if(o.label) s+=T_(x+(o.lx||15),my+5,o.label);
+  return s;
+}
+/* 윗줄 전원선 위의 가로 접점 (b접점: 아래에 닿은 막대) */
+function hContact(x1,x2,type,o={}){
+  const a=x1+10, b=x2-10, m=(a+b)/2;
+  let s=L(x1,40,a,40)+L(b,40,x2,40);
+  if(type==='b') s+=L(a-4,43.3,b+4,43.3); else s+=L(a-4,33,b+4,33);
+  if(o.eocr) s+=L(m-5,38.3,m+5,48.3)+L(m-5,48.3,m+5,38.3);
+  if(o.pb){ const by=type==='b'?43.3:33; s+=L(m,by,m,29)+L(m-5,29,m+5,29); }
+  s+=term(a,40)+term(b,40);
+  if(o.label) s+=T_(m,22,o.label,'lbl c sm');
+  return s;
+}
+function mainContact(x,y1,y2){
+  const st=Math.min(10,(y2-y1)/4);
+  return L(x,y1,x,y1+st)+L(x,y2-st,x,y2)+L(x,y2-st,x+11,y1+st+3)+term(x,y1)+term(x,y2);
+}
+function coil(x,label,small){
+  return `<circle class="fillp" cx="${x}" cy="460" r="16"/>`+`<text class="lbl c${small?' sm':''}" x="${x}" y="${small?464:465}">${label}</text>`+term(x,444)+term(x,476);
+}
+function lamp(x,label){
+  const d=11.3;
+  return `<circle class="lamp${label}" cx="${x}" cy="460" r="16"/>`+L(x-d,460-d,x+d,460+d)+L(x-d,460+d,x+d,460-d)+term(x,444)+term(x,476)+T_(x+6,500,label,'lbl sm');
+}
+function mainSym(){
+  let s='';
+  [40,80,120].forEach((x,i)=>{ s+=`<rect class="fillp" x="${x-5}" y="20" width="10" height="10"/>`+T_(x,14,['L1','L2','L3'][i],'lbl c sm'); });
+  s+=T_(134,29,'3P3W AC 220V','tag')+T_(134,60,'MCCB 생략 (직결)','tag');
+  s+=`<rect class="fillp" x="22" y="110" width="116" height="30" rx="2"/>`;
+  [40,80,120].forEach(x=>s+=L(x,110,x,140)+`<circle class="fillp" cx="${x}" cy="125" r="5"/>`+term(x,110)+term(x,140));
+  s+=T_(146,130,'EOCR','lbl sm');
+  [40,80,120].forEach(x=>s+=mainContact(x,220,260)); s+=L(45.5,241.5,128,241.5,'dash')+T_(134,246,'MC1','lbl sm');
+  [190,230,270].forEach(x=>s+=mainContact(x,220,260)); s+=L(195.5,241.5,280,241.5,'dash')+T_(284,246,'MC2','lbl sm');
+  [40,80,120].forEach((x,i)=>{ s+=`<rect class="fillp" x="${x-5}" y="330" width="10" height="10"/>`+T_(x+8,339,['U','V','W'][i],'tag'); });
+  s+=`<path d="M40 340 V352 L66 368"/><path d="M80 340 V362"/><path d="M120 340 V352 L94 368"/><circle class="fillp" cx="80" cy="382" r="20"/>`+T_(80,387,'M','lbl c');
+  return s;
+}
+const SYMBOLS = mainSym()+PD.sym();
+
+/* ================= 제어판 배치 (보통합판 600 × 400 mm) ================= */
+const BW=600, BH=400;
+const CH = {top:[112,144], bot:[240,286]};
+const CH_NAME = {top:'위쪽 배선로 (윗줄 기구와 소켓 줄 사이)', bot:'아래쪽 배선로 (소켓 줄과 아랫줄 기구 사이)'};
+const MARGIN = {L:[6,32], R:[574,596]};
+const SOCK_CX=[126,229,331,433,536], SOCK_Y=150, SOCK_W=72, SOCK_H=84;
+const PIN = {}, DEV = [];
+(function placeAll(){
+  const LY=PD.LAYOUT;
+  LY.SOCKETS.forEach((k,i)=>{
+    const is12 = REF[REF_OF[k]].kind==='12핀', cx=SOCK_CX[i], x=cx-SOCK_W/2;
+    const top = is12?[1,2,3,4,5,6]:[6,5,4,3], bot = is12?[7,8,9,10,11,12]:[7,8,1,2];
+    DEV.push({kind:'sock',k,x,y:SOCK_Y,w:SOCK_W,h:SOCK_H,is12});
+    top.forEach((p,j)=>PIN[k+'-'+p]={x:x+SOCK_W*(j+.5)/top.length,y:SOCK_Y+7,ch:'top',label:`${k} ${circ(p)}`,t:p});
+    bot.forEach((p,j)=>PIN[k+'-'+p]={x:x+SOCK_W*(j+.5)/bot.length,y:SOCK_Y+SOCK_H-7,ch:'bot',label:`${k} ${circ(p)}`,t:p});
+  });
+  const tb=(id,o,names,isSupply)=>{
+    const upper=o.y<SOCK_Y, w=72, h=46;
+    DEV.push({kind:'tb',k:id,x:o.x,y:o.y,w,h,names,upper,isSupply});
+    names.forEach((n,j)=>{ const x=o.x+12+24*j; PIN[id+'-'+n]={x,y:upper?o.y+h-8:o.y+8,ch:upper?'top':'bot',label:`${isSupply?'전원':'전동기'} 단자대 ${n}`,t:n}; });
+  };
+  tb('TBL',LY.TBL,['L1','L2','L3'],true);
+  tb('TBM',LY.TBM,['U','V','W'],false);
+  { const o=LY.LAMPS, upper=o.y<SOCK_Y, w=222, h=70;
+    DEV.push({kind:'lamps',x:o.x,y:o.y,w,h,order:o.order,upper});
+    o.order.forEach((n,j)=>{ const c=o.x+37+74*j, y=upper?o.y+h-7:o.y+7;
+      PIN[n+'-1']={x:c-10,y,ch:upper?'top':'bot',label:`${n} 단자 1`,t:'1',box:'lamps'};
+      PIN[n+'-2']={x:c+10,y,ch:upper?'top':'bot',label:`${n} 단자 2 (공통)`,t:'2',box:'lamps'}; }); }
+  { const o=LY.PBS, upper=o.y<SOCK_Y, w=152, h=62;
+    DEV.push({kind:'pbs',x:o.x,y:o.y,w,h,order:o.order,upper});
+    o.order.forEach((n,j)=>{ const c=o.x+38+76*j, y=upper?o.y+h-7:o.y+7;
+      [['b1',-15],['b2',-5],['a1',5],['a2',15]].forEach(([t,dx])=>PIN[`${n}-${t}`]={x:c+dx,y,ch:upper?'top':'bot',label:`${n} ${t[0]}접점 ${t[1]}`,t:t.toUpperCase(),box:'pbs',up:upper}); }); }
+})();
+
+/* ---------- 배선로 경로 계산 (기구 사이 통과 금지) ---------- */
+const ROUTE = {};
+(function route(){
+  const plans = WIRES.map(w=>{
+    const A=PIN[w.a], B=PIN[w.b];
+    if(!A||!B) throw new Error('단자 없음: '+w.a+' / '+w.b);
+    if (A.box && A.box===B.box) return {w,A,B,inbox:true};
+    if (A.ch===B.ch) return {w,A,B,segs:[{ch:A.ch,x1:A.x,x2:B.x}]};
+    const side = (A.x+B.x)/2 <= BW/2 ? 'L':'R';
+    return {w,A,B,side,segs:[{ch:A.ch,x1:A.x,x2:null,end:side},{ch:B.ch,x1:B.x,x2:null,end:side}]};
+  });
+  const bych = {top:[],bot:[]};
+  plans.forEach(p=>(p.segs||[]).forEach(s=>bych[s.ch].push({p,s})));
+  for (const side of ['L','R']){
+    const list = plans.filter(p=>p.side===side).sort((a,b)=>Math.abs(a.A.x-a.B.x)-Math.abs(b.A.x-b.B.x));
+    const [lo,hi] = MARGIN[side], n=list.length;
+    list.forEach((p,i)=>{ const f=(i+1)/(n+1); p.mx = side==='L' ? hi-(hi-lo)*f : lo+(hi-lo)*f; });
+  }
+  plans.forEach(p=>(p.segs||[]).forEach(s=>{ if(s.x2==null) s.x2=p.mx; }));
+  for (const ch of Object.keys(bych)){
+    const list = bych[ch].sort((a,b)=>Math.abs(a.s.x1-a.s.x2)-Math.abs(b.s.x1-b.s.x2));
+    const [lo,hi]=CH[ch], n=list.length;
+    list.forEach((o,i)=>{ o.s.y = lo+(hi-lo)*(i+.5)/n; });
+  }
+  const boxK={};
+  plans.forEach(p=>{
+    let pts, desc;
+    if (p.inbox){
+      const dir = p.A.ch==='top' ? -1 : 1, k=(boxK[p.A.box]=(boxK[p.A.box]||0)+1);
+      const y = p.A.y + dir*(4+2*k);
+      pts=[[p.A.x,p.A.y],[p.A.x,y],[p.B.x,y],[p.B.x,p.B.y]]; desc='컨트롤 박스 안 점퍼';
+    } else {
+      const [s1,s2]=p.segs;
+      if (!p.side){ pts=[[p.A.x,p.A.y],[p.A.x,s1.y],[p.B.x,s1.y],[p.B.x,p.B.y]]; desc=CH_NAME[s1.ch]; }
+      else { pts=[[p.A.x,p.A.y],[p.A.x,s1.y],[p.mx,s1.y],[p.mx,s2.y],[p.B.x,s2.y],[p.B.x,p.B.y]];
+        desc=`${CH_NAME[s1.ch]} → ${p.side==='L'?'왼쪽':'오른쪽'} 가장자리 → ${CH_NAME[s2.ch]}`; }
+    }
+    ROUTE[p.w.id]={d:'M'+pts.map(q=>q[0].toFixed(2)+' '+q[1].toFixed(2)).join(' L'),desc};
+  });
+})();
+const PIN_COUNT = {};
+WIRES.forEach(w=>{ PIN_COUNT[w.a]=(PIN_COUNT[w.a]||0)+1; PIN_COUNT[w.b]=(PIN_COUNT[w.b]||0)+1; });
+const MAX_PER_PIN = Math.max(...Object.values(PIN_COUNT));
+
+/* ================= 상태 ================= */
+const KEY=`lift-practice-p${CUR_PROB}`;
+let state={mode:'pins',pins:{},wired:[],checked:false,big:false,quiz:{}};
+try{ const s=JSON.parse(localStorage.getItem(KEY)); if(s&&typeof s==='object') state=Object.assign(state,s); }catch(e){}
+if(!['pins','wire','rope'].includes(state.mode)) state.mode='pins';
+if(!state.quiz||typeof state.quiz!=='object') state.quiz={};
+const wired=new Set((state.wired||[]).filter(id=>WIRES.some(w=>w.id===id)));
+const sel={slot:null,wire:null,hint:null,fresh:null,q:null};
+let ST={};
+function save(){ state.wired=[...wired]; try{ localStorage.setItem(KEY,JSON.stringify(state)); }catch(e){} }
+const setKey=a=>[...a].sort((x,y)=>x-y).join();
+function computeStatus(){
+  const st={};
+  for (const id of EL_IDS){
+    const e=EL[id], u=state.pins[id]||[];
+    const filled=e.ans.filter((_,i)=>u[i]!=null).length;
+    if (filled<e.ans.length){ st[id]=filled?'part':'empty'; continue; }
+    const ok = e.exact ? e.ans.every((v,i)=>u[i]===v) : [e.ans,...(e.alt||[])].some(a=>setKey(u)===setKey(a));
+    st[id]=ok?'ok':'bad';
+  }
+  return st;
+}
+
+
+/* ================= 렌더링: 도면 ================= */
+function slotsSVG(id){
+  const e=EL[id], w=e.w||18;
+  return e.slots.map(([cx,cy],i)=>{
+    if (state.mode==='wire') return `<text class="pinlbl" x="${cx}" y="${cy+4}">${e.ans[i]}</text>`;
+    const u=(state.pins[id]||[])[i];
+    let c='slot';
+    if (state.checked && u!=null){ if(ST[id]==='ok') c+=' ok'; else if(ST[id]==='bad') c+=' bad'; }
+    if (sel.slot && sel.slot.id===id && sel.slot.i===i) c+=' active';
+    return `<g class="${c}" data-slot="${id}:${i}" tabindex="0" role="button" aria-label="${e.name} ${i+1}번째 핀번호${u!=null?' '+u:' 비어 있음'}"><rect x="${cx-w/2}" y="${cy-7}" width="${w}" height="14" rx="3"/><text x="${cx}" y="${cy+4}">${u!=null?u:''}</text></g>`;
+  }).join('');
+}
+function renderSchematic(){
+  const svg=$('#sch'); svg.setAttribute('class','mode-'+state.mode); svg.setAttribute('viewBox',`0 0 ${PD.W} 560`);
+  let s=`<defs><pattern id="grid" width="20" height="20" patternUnits="userSpaceOnUse"><path d="M20 0H0V20" fill="none" stroke="var(--grid)" stroke-width="1"/></pattern></defs><rect width="${PD.W}" height="560" fill="url(#grid)"/>`;
+  s+=WIRES.map(w=>{
+    let c='w t-'+w.type;
+    if (state.mode==='wire'){ if(wired.has(w.id)) c+=' on'; if(sel.hint===w.id) c+=' hint'; if(sel.wire===w.id) c+=' sel'; }
+    return `<g class="${c}" data-wire="${w.id}">${w.d.map(d=>`<path class="vis" d="${d}"/>`).join('')}${w.d.map(d=>`<path class="hit" d="${d}"/>`).join('')}</g>`;
+  }).join('');
+  s+=`<g class="sym">${SYMBOLS}</g>`;
+  s+=PD.JN.map(([x,y])=>`<circle class="jn" cx="${x}" cy="${y}" r="3.4"/>`).join('');
+  s+=EL_IDS.map(slotsSVG).join('');
+  svg.innerHTML=s;
+}
+
+/* ================= 렌더링: 1단계 오른쪽 ================= */
+function hintFor(id){
+  const e=EL[id], r=REF[REF_OF[e.comp]];
+  const set=setKey(e.ans);
+  const m=r.items.find(it=>it.length===3 && setKey([it[1],it[2]])===set);
+  const kind=m?m[0]:'';
+  if (e.exact) return `${r.title}의 ${kind}입니다. 위 칸이 전원 쪽, 아래 칸이 부하 쪽 번호예요.`;
+  const same=r.items.filter(it=>it.length===3 && it[0]===kind);
+  const extra = same.length>1 ? ` 이 기구에는 ${kind}이 ${same.map(it=>circ(it[1])+'–'+circ(it[2])).join(', ')} 두 개 있으니, 도면에서 공통 번호를 보고 골라요.` : '';
+  const alt = e.alt ? ' ⑩ 대신 기구 안에서 이어진 ⑪을 적어도 정답으로 봅니다.' : '';
+  return `${r.title}의 ${kind}입니다. 내부결선도에서 찾아 두 번호를 적으세요.${extra}${alt}`;
+}
+const CL={coil:'#D2453A',a:'#2F6FD6',b:'#D9822B',main:'var(--ink)',e:'#2E9A4A'};
+function itemColor(name){ if(/코일|전원/.test(name)) return CL.coil; if(/b접점/.test(name)) return CL.b; if(/a접점/.test(name)) return CL.a; if(/전극/.test(name)) return CL.e; return CL.main; }
+function contactH(x,y,type,c){ // 가로 접점 (x: 중심). 도면 방식: 단자 o o + 가동 막대(a: 위로 떨어짐 / b: 아래에 닿음)
+  const isA=type[type.length-1]==='a', by=isA?y-7:y+3.4;
+  let o=`<line x1="${x-16}" y1="${by}" x2="${x+16}" y2="${by}"/>`;
+  if(type[0]==='t') o+=`<path d="M${x-5} ${by} L${x} ${by-6.5} L${x+5} ${by}"/>`;
+  if(type[0]==='f') o+=`<path d="M${x} ${by-6.5} L${x+3.6} ${by} L${x} ${by+6.5} L${x-3.6} ${by} Z" style="fill:var(--c)"/>`;
+  o+=`<circle class="t" cx="${x-12}" cy="${y}" r="2.6"/><circle class="t" cx="${x+12}" cy="${y}" r="2.6"/>`;
+  return o;
+}
+function contactV(x,y1,y2,type){ // 세로 접점
+  const m=(y1+y2)/2; let o=`<line x1="${x}" y1="${y1}" x2="${x}" y2="${m-12}"/><line x1="${x}" y1="${m+12}" x2="${x}" y2="${y2}"/>`;
+  if(type==='a') o+=`<line x1="${x}" y1="${m+12}" x2="${x+10}" y2="${m-10}"/>`;
+  else o+=`<line x1="${x}" y1="${m-12}" x2="${x-9}" y2="${m-12}"/><line x1="${x}" y1="${m+12}" x2="${x-8}" y2="${m-15}"/>`;
+  return o+`<circle class="t" cx="${x}" cy="${m-12}" r="2.4"/><circle class="t" cx="${x}" cy="${m+12}" r="2.4"/>`;
+}
+const P8={4:[-22,-52],5:[22,-52],3:[-52,-16],6:[52,-16],2:[-52,22],7:[52,22],1:[-22,54],8:[22,54]};
+const DRAW8={
+  X:{coil:1,L:{com:1,to:[[4,'b','b접점'],[3,'a','a접점']]},R:{com:8,to:[[5,'b','b접점'],[6,'a','a접점']]}},
+  T:{coil:1,L:{com:1,vert:1,to:[[3,'a','순시 a']]},R:{com:8,to:[[5,'tb','한시 b'],[6,'ta','한시 a']]}},
+  FR:{coil:1,R:{com:8,to:[[5,'fb','b접점'],[6,'fa','a접점']]}},
+  FLS:{fls:1,L:{com:4,top:1,to:[[3,'a','a접점'],[2,'b','b접점']]}}
+};
+function draw8(k,on,hl){
+  const cx=140,cy=102, P=p=>[cx+P8[p][0],cy+P8[p][1]], D=DRAW8[k];
+  const G=(pins,c,body)=>`<g class="it${on(pins)?' on':''}" data-it="${pins.join(',')}" style="--c:${c}">${body}</g>`;
+  let o=`<circle class="base" cx="${cx}" cy="${cy}" r="76"/><circle class="hole" cx="${cx}" cy="${cy}" r="15"/><rect class="hole" x="${cx-4}" y="${cy+11}" width="8" height="8" rx="1"/>`;
+  const side=(g,dir)=>{
+    const bx = dir>0 ? 268 : 12, kx = dir>0 ? 220 : 60, jx = kx+26*dir;
+    const [px,py]=P(g.com);
+    if(g.vert){ const [p,type,lab]=g.to[0], [x,y]=P(p), [cx1]=P(2), cvx=bx+10, t1=y+22, t2=y+54;
+      const busV=`M${px} ${py} V182 H${cx1+6} a6 6 0 0 0 -12 0 H${cvx} V${t2}`;
+      return G([g.com,p],CL.a,`<path d="${busV}"/><path d="M${x} ${y} H${cvx} V${t1}"/><line x1="${cvx+7}" y1="${t1-3}" x2="${cvx+7}" y2="${t2+3}"/><circle class="t" cx="${cvx}" cy="${t1}" r="2.6"/><circle class="t" cx="${cvx}" cy="${t2}" r="2.6"/><text x="${cvx+13}" y="${(t1+t2)/2+4}">${lab}</text>`);
+    }
+    const ys=g.to.map(t=>P(t[0])[1]), ym=g.to.length>1?(Math.min(...ys)+Math.max(...ys))/2:ys[0];
+    let bus;
+    if(g.top) bus=`M${px} ${py} V14 H${bx} V${ym} H${jx}`;
+    else { const cross = dir>0 ? P(7)[0] : P(2)[0];
+      bus = dir>0 ? `M${px} ${py} V182 H${cross-6} a6 6 0 0 1 12 0 H${bx} V${ym} H${jx}` : `M${px} ${py} V182 H${cross+6} a6 6 0 0 0 -12 0 H${bx} V${ym} H${jx}`; }
+    let out='';
+    g.to.forEach(([p,type,lab])=>{ const [x,y]=P(p), c=type.endsWith('b')?CL.b:CL.a, isA=type.endsWith('a');
+      out+=G([g.com,p],c,`<path d="${bus}"/><path d="M${x} ${y} H${kx-12*dir}"/><path d="M${kx+12*dir} ${y} H${jx} V${ym}"/>`+contactH(kx,y,type,c)
+        +(g.to.length>1?`<circle cx="${jx}" cy="${ym}" r="3" style="fill:var(--c)"/>`:'')
+        +`<text x="${kx}" y="${isA?y-(type[0]==='a'?12:17):y-7}" text-anchor="middle">${lab}</text>`); });
+    return out;
+  };
+  if(D.coil){ const [x2,y2]=P(2),[x7,y7]=P(7);
+    o+=G([2,7],CL.coil,`<path d="M${x2} ${y2} V210 M${x7} ${y7} V210"/><path d="M${x2+4} 202 H${x7-4} M${x2+10} 198 l-6 4 6 4 M${x7-10} 198 l6 4 -6 4"/><text x="${cx}" y="196" text-anchor="middle">AC 220V</text>`); }
+  if(D.L) o+=side(D.L,-1);
+  if(D.R) o+=side(D.R,1);
+  if(D.fls){ const [x5,y5]=P(5),[x6,y6]=P(6),[x7,y7]=P(7),[x8,y8]=P(8),[x1,y1]=P(1);
+    o+=G([5,6],CL.coil,`<path d="M${x5} ${y5} H228 M${x6} ${y6} H228"/><circle class="t" cx="228" cy="${y5}" r="2.4"/><circle class="t" cx="228" cy="${y6}" r="2.4"/><path d="M238 ${y5+2} V${y6-2} M234 ${y5+8} l4 -6 4 6 M234 ${y6-8} l4 6 4 -6"/><text x="246" y="${(y5+y6)/2-2}">AC</text><text x="246" y="${(y5+y6)/2+10}">220V</text>`);
+    o+=`<rect x="266" y="108" width="30" height="100" rx="3" class="frame" stroke-dasharray="3 3"/>`;
+    o+=G([7],CL.e,`<path d="M${x7} ${y7} H266"/><text x="270" y="${y7+4}">E1</text>`);
+    o+=G([8],CL.e,`<path d="M${x8} ${y8} H266"/><text x="270" y="${y8+4}">E2</text>`);
+    o+=G([1],CL.e,`<path d="M${x1} ${y1} V196 H266 M${x1} 196 V204 M${x1-9} 204 H${x1+9} M${x1-6} 208 H${x1+6} M${x1-3} 212 H${x1+3}"/><text x="270" y="200">E3</text>`);
+  }
+  Object.keys(P8).forEach(p=>{ const [x,y]=P(+p); o+=`<g class="pn${hl.has(+p)?' hl':''}" data-p="${p}"><circle cx="${x}" cy="${y}" r="11"/><text x="${x}" y="${y+4}">${p}</text></g>`; });
+  return `<svg class="sock" viewBox="0 0 300 220" aria-hidden="true">${o}</svg>`;
+}
+const DRAW12={
+  MC:{top:['L1','L2','L3','a1','b1','A1'],bot:['U','V','W','a2','b2','A2'],cols:['m','m','m','a','b','c']},
+  EOCR:{top:['L1','L2','L3','96','98','A1'],bot:['U','V','W','95','97','A2'],cols:['e','e','e','b','a','c']}
+};
+function draw12(k,on,hl){
+  const D=DRAW12[k], X=i=>36+44*i, y1=52, y2=176;
+  const G=(pins,c,body)=>`<g class="it${on(pins)?' on':''}" data-it="${pins.join(',')}" style="--c:${c}">${body}</g>`;
+  let o=`<rect class="frame" x="8" y="4" width="284" height="220" rx="4"/>`;
+  D.cols.forEach((t,i)=>{ const x=X(i), pt=i+1, pb=i+7;
+    let body='', c=CL.main;
+    if(t==='m'){ body=contactV(x,y1,y2,'a'); }
+    if(t==='e'){ body=`<line x1="${x}" y1="${y1}" x2="${x}" y2="${y2}"/>`; }
+    if(t==='a'){ c=CL.a; body=contactV(x,y1,y2,'a'); }
+    if(t==='b'){ c=CL.b; body=contactV(x,y1,y2,'b'); }
+    if(t==='c'){ c=CL.coil; body=`<line x1="${x}" y1="${y1}" x2="${x}" y2="96"/><line x1="${x}" y1="132" x2="${x}" y2="${y2}"/><circle class="c" cx="${x}" cy="114" r="18"/><text x="${x}" y="118" text-anchor="middle">전원</text>`; }
+    if(k==='EOCR' && (t==='a'||t==='b')){
+      const bx = t==='b' ? x-4.5 : x+15;
+      body=`<line x1="${x}" y1="${y1}" x2="${x}" y2="96"/><line x1="${x}" y1="132" x2="${x}" y2="${y2}"/>`
+        +`<circle class="t" cx="${x}" cy="100" r="4.5"/><circle class="t" cx="${x}" cy="128" r="4.5"/>`
+        +`<line x1="${bx}" y1="90" x2="${bx}" y2="138"/>`
+        +`<path d="M${bx-6} 108 l12 12 M${bx+6} 108 l-12 12"/>`;
+    }
+    let pins=[pt,pb];
+    if(k==='EOCR' && t==='b') pins=[10,4];
+    if(k==='EOCR' && t==='a'){ pins=[10,5]; body+=`<path d="M${X(3)} 162 H${x}"/><circle cx="${X(3)}" cy="162" r="3" style="fill:var(--c)"/><circle cx="${x}" cy="162" r="3" style="fill:var(--c)"/>`; }
+    o+=G(pins,c,body);
+    o+=`<text class="sub" x="${x}" y="20">(${D.top[i]})</text><text class="sub" x="${x}" y="214">(${D.bot[i]})</text>`;
+  });
+  if(k==='MC') o+=`<path class="ink" d="M${X(0)+5} 114 H${X(2)+8}" stroke-dasharray="4 3"/>`;
+  if(k==='EOCR') o+=`<rect x="${X(0)-18}" y="100" width="${X(2)-X(0)+36}" height="28" rx="2" style="fill:var(--surface);stroke:var(--ink);stroke-width:1.4"/><text class="num" x="${X(1)}" y="119">EOCR</text>`;
+  for(let i=0;i<6;i++){ [[i+1,36],[i+7,192]].forEach(([p,y])=>{ o+=`<g class="pn${hl.has(p)?' hl':''}" data-p="${p}"><circle cx="${X(i)}" cy="${y}" r="11"/><text x="${X(i)}" y="${y+4}">${p}</text></g>`; }); }
+  return `<svg class="sock" viewBox="0 0 300 228" aria-hidden="true">${o}</svg>`;
+}
+function refCard(k){
+  const r=REF[k];
+  const active=!!(sel.slot && REF_OF[EL[sel.slot.id].comp]===k);
+  const ans=active?EL[sel.slot.id].ans:[];
+  const hl=new Set(ans), key=[...ans].sort((a,b)=>a-b).join();
+  const on=pins=> active && (pins.length===1 ? hl.has(pins[0]) && ans.length===3 : [...pins].sort((a,b)=>a-b).join()===key);
+  const svg = r.kind==='12핀' ? draw12(k,on,hl) : draw8(k,on,hl);
+  const cols=r.rows[0].length;
+  const strip=`<p class="strip-cap">소켓 단자 배치 (윗줄 / 아랫줄)</p><div class="strip" style="grid-template-columns:repeat(${cols},1fr)">${r.rows.flat().map(p=>`<span data-p="${p}" class="${hl.has(p)?'hl':''}">${p}</span>`).join('')}</div>`;
+  const li=r.items.map(it=>{
+    const pins=it.slice(1);
+    return `<li data-pins="${pins.join(',')}" class="${on(pins)?'on':''}"><i style="background:${itemColor(it[0])}"></i><b>${pins.map(circ).join('–')}</b>${it[0]}</li>`;
+  }).join('');
+  return `<article class="ref${active?' active':''}" data-ref="${k}"><header><h4>${r.title}</h4><span>${r.kind}</span></header>${svg}${strip}<ul>${li}</ul>${r.note?`<p class="rnote">${r.note}</p>`:''}</article>`;
+}
+function renderSidePins(){
+  let now;
+  if (sel.slot){
+    const id=sel.slot.id, e=EL[id], s=ST[id];
+    now=`<h4>${e.name}</h4><p>${hintFor(id)}</p>`;
+    if (state.checked && s==='bad') now+=`<p class="warn">내부결선도와 맞지 않아요. 파란색으로 표시된 핀을 다시 보세요.</p>`;
+    else if (state.checked && s==='ok') now+=`<p style="color:var(--ok);font-weight:600">맞았어요.</p>`;
+  } else now=`<h4>도면의 점선 칸을 눌러 시작하세요</h4><p>칸을 누르면 번호판이 열려요. 어느 기구의 어떤 접점인지 아래 내부결선도에 파란색으로 표시됩니다.</p>`;
+  $('#side').innerHTML=`<div class="pane-bar"><h3>기구 내부결선도</h3></div><div class="card now">${now}</div><div class="refs">${['EOCR','MC','T','FR','X'].filter(k=>EL_IDS.some(id=>REF_OF[EL[id].comp]===k)).map(refCard).join('')}</div>`;
+}
+
+/* ================= 렌더링: 2단계 제어판 ================= */
+const LAMP_FILL={RL:'#E0463A',GL:'#2E9E55',YL:'#E8B400'}, PB_FILL={PB0:'#2E9E55',PB1:'#E0463A',PB2:'#E0463A'};
+function panelSVG(){
+  let s=`<rect class="plate" x="0" y="0" width="${BW}" height="${BH}" rx="3"/>`;
+  for (const ch of ['top','bot']) s+=`<rect class="duct" x="${MARGIN.L[0]-2}" y="${CH[ch][0]-2}" width="${MARGIN.R[1]-MARGIN.L[0]+4}" height="${CH[ch][1]-CH[ch][0]+4}" rx="1.5"/>`;
+  for (const sd of ['L','R']) s+=`<rect class="duct" x="${MARGIN[sd][0]-2}" y="${CH.top[0]}" width="${MARGIN[sd][1]-MARGIN[sd][0]+4}" height="${CH.bot[1]-CH.top[0]}" rx="1.5"/>`;
+  for (const d of DEV){
+    if (d.kind==='sock'){
+      s+=`<rect class="part" x="${d.x}" y="${d.y}" width="${d.w}" height="${d.h}" rx="2"/><circle class="sockc" cx="${d.x+d.w/2}" cy="${d.y+d.h/2}" r="${d.is12?20:17}"/><rect class="sockk" x="${d.x+d.w/2-3}" y="${d.y+d.h/2+(d.is12?17:14)}" width="6" height="5" rx="1"/><text class="ptxt" x="${d.x+d.w/2}" y="${d.y+d.h/2+3}">${d.k}</text>`;
+    } else if (d.kind==='tb'){
+      s+=`<rect class="part" x="${d.x}" y="${d.y}" width="${d.w}" height="${d.h}" rx="1.5"/>`+L(d.x,d.y+d.h/2,d.x+d.w,d.y+d.h/2,'tbdiv');
+      d.names.forEach((n,j)=>{ const x=d.x+12+24*j, outer=d.upper?d.y+8:d.y+d.h-8;
+        if(j) s+=L(d.x+24*j,d.y,d.x+24*j,d.y+d.h,'tbdiv');
+        s+=`<g class="pin blank"><circle cx="${x}" cy="${outer}" r="3.4"/></g>`;
+        s+=d.isSupply ? `<path class="stub" d="M${x} ${outer} V${outer-38}"/>` : `<path class="stub" d="M${x} ${outer} V${outer+36}"/>`;
+        s+=`<text class="tblab" x="${x}" y="${d.y+d.h/2+2.2}">${n}</text>`; });
+      s+= d.isSupply ? `<text class="note" x="${d.x+d.w+6}" y="${d.y-16}">전원 측 약 100mm 인출, 끝 10mm 피복 벗김</text>` : `<text class="note" x="${d.x+d.w+6}" y="${d.y+d.h+26}">전동기로</text>`;
+    } else if (d.kind==='lamps'){
+      s+=`<rect class="cbox" x="${d.x}" y="${d.y}" width="${d.w}" height="${d.h}" rx="4"/>`;
+      d.order.forEach((n,j)=>{ const c=d.x+37+74*j, cy=d.y+(d.upper?30:40); s+=`<circle cx="${c}" cy="${cy}" r="19" fill="${LAMP_FILL[n]}" class="lampc"/><text class="btxt" x="${c}" y="${cy+3.5}">${n}</text>`; });
+    } else if (d.kind==='pbs'){
+      s+=`<rect class="cbox" x="${d.x}" y="${d.y}" width="${d.w}" height="${d.h}" rx="4"/>`;
+      d.order.forEach((n,j)=>{ const c=d.x+38+76*j, cy=d.y+(d.upper?26:36); s+=`<circle cx="${c}" cy="${cy}" r="15" class="pbring"/><circle cx="${c}" cy="${cy}" r="11" fill="${PB_FILL[n]}"/><text class="btxt" x="${c}" y="${cy+22}" style="fill:#E6EAED">${n}</text>`; });
+    }
+  }
+  const hl=new Set();
+  if (sel.wire){ const w=WIRES.find(x=>x.id===sel.wire); hl.add(w.a); hl.add(w.b); }
+  const list=WIRES.filter(w=>wired.has(w.id)).sort((a,b)=>(a.id===sel.wire)-(b.id===sel.wire));
+  s+=list.map(w=>{
+    const d=ROUTE[w.id].d, cw=w.type==='main'?1.7:1.15;
+    const c=`pw t-${w.type}${sel.wire===w.id?' sel':''}${sel.fresh===w.id?' fresh':''}`;
+    return `<g class="${c}" data-wire="${w.id}"><path class="halo" d="${d}" pathLength="1" stroke-width="${sel.wire===w.id?cw+3:cw+.8}"/><path class="core" d="${d}" pathLength="1" stroke-width="${cw}"/></g>`;
+  }).join('');
+  s+=Object.entries(PIN).map(([id,p])=>`<g class="pin${hl.has(id)?' hl':''}"><circle cx="${p.x}" cy="${p.y}" r="${p.box?2.6:3.4}"/><text x="${p.x}" y="${p.y+1.3}" style="font-size:${p.box?2.4:3.6}px">${p.t}</text></g>`).join('');
+  s+=[...hl].map(id=>{ const p=PIN[id]; return `<circle cx="${p.x}" cy="${p.y}" r="5.4" fill="none" stroke="var(--sel)" stroke-width="1.2"/>`; }).join('');
+  return s;
+}
+function renderSideWire(){
+  let info;
+  if (sel.wire){
+    const w=WIRES.find(x=>x.id===sel.wire);
+    const note=w.note||'주회로는 같은 상끼리 2.5㎟ 적색선으로 연결하고, 끝에는 압착단자와 절연튜브를 씌웁니다.';
+    info=`<h4>${PIN[w.a].label} → ${PIN[w.b].label}</h4><span class="chip">${TYPE_NAME[w.type]}</span><span class="chip">경로: ${ROUTE[w.id].desc}</span><p>${note}</p>
+      <div class="row">${wired.has(w.id)?`<button class="btn" data-act="unwire">이 선 빼기</button>`:`<button class="btn primary" data-act="wireit">연결하기</button>`}</div>`;
+  } else if (sel.hint){
+    const w=WIRES.find(x=>x.id===sel.hint);
+    info=`<h4>다음 선: ${PIN[w.a].label} → ${PIN[w.b].label}</h4><p>도면에서 깜빡이는 선을 눌러 연결하세요.</p>`;
+  } else {
+    info=`<h4>도면의 선을 눌러 보세요</h4><p>누른 선이 제어판의 어느 단자와 어느 단자를 잇는지, 어느 배선로를 따라가는지 그려집니다. 막막하면 "다음 선 보기"를 눌러 순서대로 따라가 보세요.</p>`;
+  }
+  const rules=`<div class="card rules"><h4 style="color:var(--ink)">이 배선이 지키는 요구사항</h4><ul>
+    <li><b>기구 사이 배선 금지</b>: 모든 선이 회색 배선로와 양쪽 가장자리로만 지나갑니다.</li>
+    <li><b>수평·수직 노출 배선</b>: 대각선 없이 직각으로 꺾고, 케이블타이로 묶어 정리합니다.</li>
+    <li><b>한 단자 최대 ${MAX_PER_PIN}가닥</b>: 3가닥 이상은 실격이라, 같은 점은 옆 기구로 건너가며 연결합니다.</li>
+    <li><b>전선 구분</b>: 주회로 2.5㎟ 적색(압착단자+절연튜브), 보조회로 1.5㎟ 청색(나선 직결, 나선 2mm 이상 노출 금지).</li>
+    <li><b>단자대 대체</b>: 도면의 전원(L1 L2 L3)과 부하(U V W)는 단자대로 작업하고, MCCB는 생략해 직결합니다.</li></ul></div>`;
+  $('#side').innerHTML=`<div class="pane-bar"><h3>제어판 (600 × 400)</h3>
+      <div class="legend"><span><i style="background:var(--w-main)"></i>주회로</span><span><i style="background:var(--w-ctrl)"></i>보조회로</span>
+      <button class="btn" data-act="big">${state.big?'나란히 보기':'크게 보기'}</button></div></div>
+    <div class="panelwrap"><svg id="panel" viewBox="-8 -8 ${BW+16} ${BH+16}" class="${sel.wire?'has-sel':''}" role="img" aria-label="제어판 배선 상태">${panelSVG()}</svg></div>
+    <div class="card info" style="margin-top:12px">${info}</div>${rules}`;
+}
+
+/* ================= 렌더링: 3단계 요구사항 점검 ================= */
+function ropeSVG(){
+  const act = sel.q ? (QUIZ.find(q=>q.id===sel.q)||{}).ref : null;
+  const g=(k,body)=>`<g class="call${act===k?' on':''}" data-call="${k}">${body}</g>`;
+  let s=`<defs><pattern id="tw" width="14" height="24" patternUnits="userSpaceOnUse" patternTransform="rotate(28)"><rect width="14" height="24" class="ropebg"/><path d="M0 0 V24" class="ropeln"/></pattern></defs>`;
+  // 로프
+  s+=`<rect x="560" y="166" width="300" height="28" fill="url(#tw)" class="rope"/>`;
+  // 소켓 몸체
+  s+=`<rect x="40" y="160" width="120" height="40" rx="6" class="steelp"/><circle cx="78" cy="180" r="9" class="hole2"/>`;
+  s+=`<path d="M160 168 L200 118 H330 L560 158 V202 L330 242 H200 L160 192 Z" class="steelp"/>`;
+  s+=`<rect x="214" y="136" width="96" height="88" rx="10" class="win"/>`;
+  // 국화꽃 (스트랜드 끝을 꺾어 마감한 모양)
+  const cx=262, cy=180; let petals='';
+  for(let i=0;i<8;i++){ const a=i*Math.PI/4; petals+=`<ellipse cx="${(cx+Math.cos(a)*20).toFixed(1)}" cy="${(cy+Math.sin(a)*20).toFixed(1)}" rx="12" ry="7" transform="rotate(${i*45} ${(cx+Math.cos(a)*20).toFixed(1)} ${(cy+Math.sin(a)*20).toFixed(1)})" class="petal"/>`; }
+  s+=g('flower',`${petals}<circle cx="${cx}" cy="${cy}" r="9" class="petal"/><path d="M${cx} ${cy-44} V100 H330" class="lead"/><text x="334" y="104" class="ct e">국화꽃 모양 (나-2)</text>`);
+  s+=g('bend',`<path d="M200 118 V82" class="lead"/><path d="M200 118 L200 242" class="mark"/><text x="14" y="76" class="ct e">구부러진 부위: 입구보다 약간 튀어나오게 (나-1)</text>`);
+  s+=g('tip',`<path d="M214 252 H248" class="dimln"/><path d="M214 244 V260 M248 244 V260" class="dimln"/><text x="231" y="276" class="ct m">5~10mm (나-4)</text><text x="231" y="292" class="ct m sub">개방된 곳 기준</text>`);
+  s+=g('bind',`<rect x="388" y="150" width="20" height="60" class="bindw"/><path d="M398 210 V282 H430" class="lead"/><text x="434" y="287" class="ct">바인드선: 소켓에 가려져 안 보이게 (나-3)</text>`);
+  s+=g('head',`<path d="M70 200 V236" class="lead"/><text x="14" y="254" class="ct">소켓 머리 부분</text><text x="14" y="270" class="ct sub">고무·나무망치만 (나-5)</text>`);
+  s+=g('tag',`<rect x="660" y="160" width="56" height="40" rx="3" class="tagp"/><text x="688" y="185" class="ct m sm">비번호</text><path d="M688 160 V120" class="lead"/><text x="688" y="112" class="ct m">견출지 + 스카치테이프 (나-6)</text>`);
+  s+=g('end',`<rect x="830" y="162" width="36" height="36" rx="3" class="tapep"/><path d="M848 198 V240" class="lead"/><text x="866" y="258" class="ct" text-anchor="end">비닐테이프 (나-7)</text>`);
+  s+=`<text x="14" y="326" class="ct sub">요구사항이 가리키는 위치를 보여 주는 개념도예요. 실제 모양과 치수는 공개문제 도면을 기준으로 하세요.</text>`;
+  return s;
+}
+function renderSideRope(){
+  const groups=['공통','와이어로프','제어회로'];
+  const card=q=>{
+    const ch=state.quiz[q.id], done=ch!=null, ok=ch===q.a;
+    const opts=q.o.map((t,i)=>{ let c='opt'; if(done){ if(i===q.a) c+=' right'; else if(i===ch) c+=' wrong'; } return `<button class="${c}" data-q="${q.id}" data-i="${i}"${done?' disabled':''}>${t}</button>`; }).join('');
+    return `<article class="qcard${sel.q===q.id?' cur':''}${done?(ok?' ok':' bad'):''}" data-qc="${q.id}"><p class="qq">${q.q}</p><div class="opts">${opts}</div>${done?`<p class="qex"><b>${ok?'맞았어요.':'다시 확인해 보세요.'}</b> ${q.ex}</p>`:''}</article>`;
+  };
+  $('#side').innerHTML=`<div class="pane-bar"><h3>요구사항 점검 문제</h3></div>`+groups.map(g=>`<h4 class="qg">${g}</h4>`+QUIZ.filter(q=>q.g===g).map(card).join('')).join('');
+}
+
+/* ================= 공통 렌더링 ================= */
+function render(){
+  ST=computeStatus();
+  const filled=EL_IDS.reduce((n,id)=>n+(state.pins[id]||[]).filter(v=>v!=null).length,0);
+  const okSlots=EL_IDS.filter(id=>ST[id]==='ok').reduce((n,id)=>n+EL[id].ans.length,0);
+  const qDone=QUIZ.filter(q=>state.quiz[q.id]!=null).length, qOk=QUIZ.filter(q=>state.quiz[q.id]===q.a).length;
+  document.querySelectorAll('.steps button').forEach(b=>b.setAttribute('aria-selected',String(b.dataset.mode===state.mode)));
+  $('#work').classList.toggle('big', state.mode==='wire' && !!state.big); $('#work').classList.toggle('wire', state.mode==='wire');
+  $('#cnt-pins').textContent=state.checked?`${okSlots}/${TOTAL_SLOTS} 정답`:`${filled}/${TOTAL_SLOTS}`;
+  $('#cnt-wire').textContent=`${wired.size}/${WIRES.length}`;
+  $('#cnt-rope').textContent=`${qOk}/${QUIZ.length}`;
+  $('#schWrap').hidden=state.mode==='rope'; $('#ropeWrap').hidden=state.mode!=='rope';
+  $('#leftTitle').textContent=state.mode==='rope'?'와이어로프 끝부분 처리 (완성 모습)':'시퀀스 도면';
+  const tools=$('#tools'), st=$('#status');
+  if (state.mode==='pins'){
+    tools.innerHTML=`<button class="btn primary" data-act="check">채점하기</button><button class="btn" data-act="answer">정답 채우기</button><button class="btn" data-act="clearpins">모두 지우기</button>`;
+    st.innerHTML=state.checked
+      ? (okSlots===TOTAL_SLOTS?`<span class="good">${TOTAL_SLOTS}칸 모두 맞았어요.</span> 이제 2단계에서 제어판에 배선해 보세요.`:`<b>${okSlots}/${TOTAL_SLOTS}칸 정답.</b> 빨간 칸을 눌러 무엇이 틀렸는지 확인하세요.`)
+      : `칸을 채운 뒤 채점하기를 누르세요. 입력 <b>${filled}/${TOTAL_SLOTS}</b>칸`;
+    renderSchematic(); renderSidePins();
+  } else if (state.mode==='rope'){
+    tools.innerHTML=`<button class="btn" data-act="qreset">다시 풀기</button>`;
+    $('#rope').innerHTML=ropeSVG();
+    st.innerHTML=qDone===QUIZ.length?`<span class="good">${QUIZ.length}문제 중 ${qOk}문제 맞았어요.</span>${qOk<QUIZ.length?' 틀린 문제의 설명을 다시 읽어 보세요.':''}`:`오른쪽 문제를 풀면 관련된 부분이 그림에 표시됩니다. <b>${qDone}/${QUIZ.length}</b>문제 풂`;
+    renderSideRope();
+  } else {
+    tools.innerHTML=`<button class="btn primary" data-act="next">다음 선 보기</button><button class="btn" data-act="wireall">모두 연결</button><button class="btn" data-act="clearwires">초기화</button>`;
+    const mainN=WIRES.filter(w=>w.type==='main').length, mainD=WIRES.filter(w=>w.type==='main'&&wired.has(w.id)).length;
+    st.innerHTML=wired.size===WIRES.length
+      ? `<span class="good">배선 완료.</span> ${WIRES.length}가닥을 모두 연결했어요. 선을 눌러 경로를 다시 확인해 보세요.`
+      : `<b>${wired.size}/${WIRES.length}</b>가닥 연결됨. 주회로 ${mainD}/${mainN}, 보조회로 ${wired.size-mainD}/${WIRES.length-mainN}`;
+    renderSchematic(); renderSideWire();
+  }
+  save(); sel.fresh=null;
+}
+
+/* ================= 번호판 ================= */
+const kp=$('#keypad');
+function openKeypad(id,i){
+  sel.slot={id,i}; render();
+  const g=document.querySelector(`[data-slot="${id}:${i}"]`);
+  const e=EL[id], max=COMP_MAX[e.comp], cur=(state.pins[id]||[])[i];
+  kp.innerHTML=`<div class="kp-head">${e.name}<span>${i+1}/${e.ans.length}번째</span></div>
+    <div class="kp-grid">${Array.from({length:max},(_,k)=>`<button data-n="${k+1}"${cur===k+1?' style="border-color:var(--sel)"':''}>${k+1}</button>`).join('')}</div>
+    <div class="kp-foot"><button data-n="clear">비우기</button><button data-n="close">닫기</button></div>`;
+  kp.hidden=false;
+  if (g){ const r=g.getBoundingClientRect(), w=kp.offsetWidth, h=kp.offsetHeight;
+    let left=r.left+r.width/2-w/2, top=r.bottom+8; if(top+h>innerHeight-8) top=r.top-h-8;
+    kp.style.left=Math.max(8,Math.min(left,innerWidth-w-8))+'px'; kp.style.top=Math.max(8,top)+'px'; }
+  (kp.querySelector('.kp-grid button')||kp).focus({preventScroll:true});
+}
+const closeKeypad=()=>{ kp.hidden=true; };
+kp.addEventListener('click',e=>{
+  const b=e.target.closest('button'); if(!b||!sel.slot) return;
+  const {id,i}=sel.slot, n=b.dataset.n;
+  if (n==='close'){ closeKeypad(); return; }
+  const arr=state.pins[id]=(state.pins[id]||[]).slice(); while(arr.length<EL[id].ans.length) arr.push(null);
+  if (n==='clear'){ arr[i]=null; closeKeypad(); render(); return; }
+  arr[i]=+n;
+  const next=arr.findIndex((v,k)=>k>i && v==null);
+  if (next>=0) openKeypad(id,next);
+  else { closeKeypad(); render(); const g=document.querySelector(`[data-slot="${id}:${i}"]`); if(g) g.focus({preventScroll:true}); }
+});
+kp.addEventListener('keydown',e=>{ if(e.key==='Escape') closeKeypad(); });
+document.addEventListener('pointerdown',e=>{ if(!kp.hidden && !kp.contains(e.target) && !e.target.closest('[data-slot]')) closeKeypad(); });
+window.addEventListener('scroll',closeKeypad,{passive:true});
+$('#schWrap').addEventListener('scroll',closeKeypad,{passive:true});
+window.addEventListener('resize',closeKeypad);
+
+/* ================= 이벤트 ================= */
+function connect(id){ wired.add(id); sel.wire=id; sel.fresh=id; if(sel.hint===id) sel.hint=null; }
+$('#sch').addEventListener('click',e=>{
+  const s=e.target.closest('[data-slot]');
+  if (s && state.mode==='pins'){ const [id,i]=s.dataset.slot.split(':'); openKeypad(id,+i); return; }
+  const w=e.target.closest('[data-wire]');
+  if (w && state.mode==='wire'){ const id=w.dataset.wire; if(!wired.has(id)) connect(id); else sel.wire=(sel.wire===id?null:id); render(); }
+});
+$('#sch').addEventListener('keydown',e=>{
+  const s=e.target.closest('[data-slot]');
+  if (s && (e.key==='Enter'||e.key===' ')){ e.preventDefault(); const [id,i]=s.dataset.slot.split(':'); openKeypad(id,+i); }
+});
+$('#side').addEventListener('click',e=>{
+  const ob=e.target.closest('button.opt');
+  if (ob){ state.quiz[ob.dataset.q]=+ob.dataset.i; sel.q=ob.dataset.q; render(); return; }
+  const qc=e.target.closest('[data-qc]');
+  if (qc && !e.target.closest('button')){ sel.q=(sel.q===qc.dataset.qc?null:qc.dataset.qc); render(); return; }
+  const pw=e.target.closest('.pw');
+  if (pw){ sel.wire=(sel.wire===pw.dataset.wire?null:pw.dataset.wire); render(); return; }
+  const b=e.target.closest('[data-act]'); if(!b) return;
+  if (b.dataset.act==='unwire'){ wired.delete(sel.wire); render(); }
+  if (b.dataset.act==='wireit'){ connect(sel.wire); render(); }
+  if (b.dataset.act==='big'){ state.big=!state.big; render(); }
+});
+$('#side').addEventListener('mouseover',e=>{
+  const qc=e.target.closest('[data-qc]');
+  if (qc && state.mode==='rope'){ const ref=(QUIZ.find(q=>q.id===qc.dataset.qc)||{}).ref; document.querySelectorAll('#rope .call').forEach(g=>g.classList.toggle('on', !!ref && g.dataset.call===ref)); return; }
+  const li=e.target.closest('.ref li'); if(!li) return;
+  refHi(li.closest('.ref'), li.dataset.pins.split(',').map(Number));
+});
+$('#side').addEventListener('mouseout',e=>{
+  const qc=e.target.closest('[data-qc]');
+  if (qc && state.mode==='rope'){ const ref=sel.q?(QUIZ.find(q=>q.id===sel.q)||{}).ref:null; document.querySelectorAll('#rope .call').forEach(g=>g.classList.toggle('on', !!ref && g.dataset.call===ref)); return; }
+  const li=e.target.closest('.ref li'); if(!li) return;
+  const card=li.closest('.ref'), k=card.dataset.ref;
+  const act=sel.slot && REF_OF[EL[sel.slot.id].comp]===k;
+  refHi(card, act?EL[sel.slot.id].ans:[]);
+});
+function refHi(card,pins){
+  const ps=pins.map(String), key=setKey(pins);
+  card.querySelectorAll('[data-p]').forEach(g=>g.classList.toggle('hl',ps.includes(g.dataset.p)));
+  card.querySelectorAll('.it').forEach(g=>{ const it=g.dataset.it.split(',').map(Number); g.classList.toggle('on', pins.length>0 && setKey(it)===key); });
+}
+$('#tools').addEventListener('click',e=>{
+  const b=e.target.closest('[data-act]'); if(!b) return; const a=b.dataset.act;
+  if (a==='check'){ state.checked=true; ST=computeStatus(); const bad=EL_IDS.find(id=>ST[id]!=='ok'); sel.slot=bad?{id:bad,i:0}:null; render(); }
+  if (a==='answer'){ EL_IDS.forEach(id=>state.pins[id]=[...EL[id].ans]); state.checked=true; sel.slot=null; render(); }
+  if (a==='clearpins'){ state.pins={}; state.checked=false; sel.slot=null; closeKeypad(); render(); }
+  if (a==='next'){ const w=WIRES.find(x=>!wired.has(x.id)); sel.hint=w?w.id:null; sel.wire=null; render(); }
+  if (a==='wireall'){ WIRES.forEach(w=>wired.add(w.id)); sel.hint=null; sel.wire=null; render(); }
+  if (a==='clearwires'){ wired.clear(); sel.hint=null; sel.wire=null; render(); }
+  if (a==='qreset'){ state.quiz={}; sel.q=null; render(); }
+});
+document.querySelectorAll('.steps button').forEach(b=>b.addEventListener('click',()=>{ state.mode=b.dataset.mode; closeKeypad(); sel.wire=null; sel.hint=null; render(); }));
+$('#resetAll').addEventListener('click',()=>{
+  if(!confirm('핀번호, 제어판 배선, 요구사항 점검 진도를 모두 지우고 처음부터 시작할까요?')) return;
+  state.pins={}; state.checked=false; wired.clear(); state.quiz={}; state.mode='pins';
+  Object.assign(sel,{slot:null,wire:null,hint:null,q:null}); closeKeypad(); render();
+});
+$('#probList').innerHTML=PROBLEMS.map(p=>`<button data-prob="${p.no}" aria-current="${p.no===CUR_PROB}"${p.ready?'':' disabled title="준비 중"'}><span class="pn">${p.no}</span>${p.short?`<span class="pt">${p.short}</span>`:''}</button>`).join('');
+$('#probList').addEventListener('click',e=>{ const b=e.target.closest('[data-prob]'); if(!b||b.disabled||+b.dataset.prob===CUR_PROB) return; location.hash='p'+b.dataset.prob; location.reload(); });
+$('#probTitle').textContent=`공개문제 ${CUR_PROB}. ${PD.title}`;
+$('#ops').innerHTML=PD.OPS;
+document.title=`공개문제 ${CUR_PROB} | 승강기기능사 실기 연습장`;
+window.addEventListener('hashchange',()=>location.reload());
+render();
+
+</script>
+</body>
+</html>
