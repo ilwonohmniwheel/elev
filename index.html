@@ -333,8 +333,8 @@ const COMP_MAX = {EOCR:12,MC1:12,MC2:12,T:8,T1:8,T2:8,FR:8,X:8};
 /* ================= 공개문제 목록 ================= */
 const PROBLEMS=[
   {no:1,short:'T1 정·역 전환',ready:true},
-  {no:2,short:'T1·T2 지연 역전',ready:true},{no:3,short:'',ready:false},{no:4,short:'',ready:false},{no:5,short:'',ready:false},
-  {no:6,short:'',ready:false},{no:7,short:'',ready:false},{no:8,short:'',ready:false},{no:9,short:'',ready:false},{no:10,short:'',ready:false}
+  {no:2,short:'T1·T2 지연 역전',ready:true},{no:3,short:'정·역 후 자동 정지',ready:true},{no:4,short:'T2 후 역회전 유지',ready:true},{no:5,short:'지연 정회전 후 역전',ready:true},
+  {no:6,short:'Y-Δ 기동',ready:true},{no:7,short:'Y-Δ + 교대 점멸',ready:true},{no:8,short:'전동기 2대 순차',ready:true},{no:9,short:'M1 간헐 → M2',ready:true},{no:10,short:'교대 → 동시 운전',ready:true}
 ];
 const CUR_PROB=(()=>{ const m=location.hash.match(/p(\d+)/); const v=m?+m[1]:1; return PROBLEMS.some(p=>p.no===v&&p.ready)?v:1; })();
 
@@ -550,8 +550,820 @@ const P2 = (()=>{
   return {title:'타이머(T1·T2)에 의한 전동기 정회전 후 지연 역회전과 과부하 표시(YL)',W:900,EL,WIRES,sym,JN,LAYOUT,OPS};
 })();
 
-const PD = ({1:P1,2:P2})[CUR_PROB];
-const EL = Object.assign({}, EL_MAIN, PD.EL);
+/* ---------- 공개문제 3 : 도면 좌표 ---------- */
+const P3 = (()=>{
+  const Px=284, Nx=296, EP=330, EA=385, EB1=400, EB2=450, PB1x=465, PB2x=505, S=540, TS=610, M2=680, T2x=750, RLx=815, GLx=885;
+  const EL = {
+    EO_P:{comp:'EOCR',name:'EOCR 전원',ans:[6,12],slots:[[EP+19,433],[EP+19,487]]},
+    EO_B:{comp:'EOCR',name:'EOCR b접점 (윗줄 전원선)',ans:[10,4],alt:[[11,4]],slots:[[EB1+10,56],[EB2-10,56]]},
+    EO_A:{comp:'EOCR',name:'EOCR a접점 (YL)',ans:[10,5],alt:[[11,5]],slots:V(EA,290,330)},
+    T1_I:{comp:'T1',name:'T1 순시 a접점 (자기유지)',ans:[1,3],slots:V(TS,70,110)},
+    T1_B:{comp:'T1',name:'T1 한시 b접점 (MC1 쪽)',ans:[8,5],slots:V(S,200,240)},
+    T2_B:{comp:'T2',name:'T2 한시 b접점 (T1 코일 쪽)',ans:[8,5],slots:V(TS,200,240)},
+    T1_A:{comp:'T1',name:'T1 한시 a접점 (MC2·T2 쪽)',ans:[8,6],slots:V(M2,200,240)},
+    M2_B:{comp:'MC2',name:'MC2 보조 b접점 (인터록)',ans:[5,11],slots:V(S,290,330)},
+    M1_C:{comp:'MC1',name:'MC1 코일',ans:[6,12],slots:C(S)},
+    T1_C:{comp:'T1',name:'T1 코일',ans:[2,7],slots:C(TS)},
+    M1_B:{comp:'MC1',name:'MC1 보조 b접점 (인터록)',ans:[5,11],slots:V(M2,290,330)},
+    M2_C:{comp:'MC2',name:'MC2 코일',ans:[6,12],slots:C(M2)},
+    T2_C:{comp:'T2',name:'T2 코일',ans:[2,7],slots:C(T2x)},
+    M1_A:{comp:'MC1',name:'MC1 보조 a접점 (RL)',ans:[4,10],slots:V(RLx,70,110)},
+    M2_A:{comp:'MC2',name:'MC2 보조 a접점 (GL)',ans:[4,10],slots:V(GLx,70,110)}
+  };
+  const N_NOTE='L3 쪽 공통선입니다. 한 단자에 2가닥을 넘지 않도록 옆 기구로 건너가며 차례로 이어요.';
+  const WIRES = [
+    ...P1.WIRES.filter(w=>w.type==='main'),
+    {id:'p1',a:'EOCR-1',b:'EOCR-6',type:'ctrl',d:[`M40 70 H${Px} V40 H${EP} V444`],note:'EOCR 앞단(L1)에서 제어 전원을 따서 EOCR 전원 ⑥으로 보냅니다. EOCR ①에는 주회로선과 이 선, 2가닥이 물려요.'},
+    {id:'p2',a:'EOCR-6',b:'EOCR-10',type:'ctrl',d:[`M${EP} 40 H${EB1}`,`M${EP} 250 H${EA} V290`],note:'EOCR 접점 공통 ⑩을 전원선에 묶습니다. 도면의 b접점(⑩-④)과 a접점(⑩-⑤)은 같은 ⑩번 단자를 씁니다.'},
+    {id:'q1',a:'EOCR-4',b:'PB0-b1',type:'ctrl',d:[`M${EB2} 40 H${PB1x}`],note:'EOCR b접점을 지난 전원을 정지 버튼 PB0의 b접점으로 보냅니다.'},
+    {id:'q2',a:'PB0-b2',b:'PB1-a1',type:'ctrl',d:[`M${PB2x} 40 H${S} V70`],note:'PB0 b접점 출력을 PB1 a접점 입력에 잇습니다. 둘 다 같은 컨트롤 박스 안이라 함 안에서 짧게 건넙니다.'},
+    {id:'q3',a:'PB1-a1',b:'T1-1',type:'ctrl',d:[`M${S} 40 H${TS} V70`],note:'같은 윗줄 전원을 T1 순시 a접점 ①로 보내 자기유지 회로를 만듭니다.'},
+    {id:'q4',a:'T1-1',b:'MC1-4',type:'ctrl',d:[`M${TS} 40 H${RLx} V70`],note:'RL용 MC1 보조 a접점 ④도 같은 전원선에서 받습니다.'},
+    {id:'q5',a:'MC1-4',b:'MC2-4',type:'ctrl',d:[`M${RLx} 40 H${GLx} V70`],note:'MC1 ④에서 MC2 ④로 건너 연결합니다.'},
+    {id:'c1',a:'PB1-a2',b:'T1-3',type:'ctrl',d:[`M${S} 110 V130 H${TS} V110`],note:'PB1 출력과 T1 순시 a접점 출력 ③을 한 점으로 묶습니다. PB1을 놓아도 T1이 동작하는 동안 전원이 유지돼요.'},
+    {id:'c2',a:'T1-3',b:'T1-8',type:'ctrl',d:[`M${S} 130 V200`,`M${TS} 130 H${M2} V200`],note:'자기유지된 전원을 T1 한시 접점 공통 ⑧로 보냅니다. 한시 b(⑧-⑤)와 한시 a(⑧-⑥)는 공통 ⑧을 함께 써요.'},
+    {id:'c3',a:'T1-8',b:'T2-8',type:'ctrl',d:[`M${TS} 130 V200`],note:'같은 점에서 T2 한시 b접점 공통 ⑧로 건너 줍니다.'},
+    {id:'t1',a:'T2-5',b:'T1-2',type:'ctrl',d:[`M${TS} 240 V444`],note:'T1 코일은 T2 한시 b접점을 거쳐 전원을 받습니다. T2 시간이 다 되면 이 접점이 열려 T1이 꺼지고 자기유지도 풀립니다.'},
+    {id:'d1',a:'T1-5',b:'MC2-5',type:'ctrl',d:[`M${S} 240 V290`],note:'T1 한시 b접점 출력을 MC2 보조 b접점(인터록)으로 보냅니다.'},
+    {id:'d2',a:'MC2-11',b:'MC1-6',type:'ctrl',d:[`M${S} 330 V444`],note:'T1 설정 시간 전이고 MC2가 쉬고 있을 때 MC1 코일에 전원이 들어갑니다.'},
+    {id:'e1',a:'T1-6',b:'MC1-5',type:'ctrl',d:[`M${M2} 240 V290`],note:'T1 한시 a접점 출력을 MC1 보조 b접점(인터록)으로 보냅니다.'},
+    {id:'e2',a:'MC1-5',b:'T2-2',type:'ctrl',d:[`M${M2} 265 H${T2x} V444`],note:'T1 한시 a접점이 닫히면 T2 코일도 함께 여자됩니다. MC1 ⑤에서 T2 ②로 건너 줘요.'},
+    {id:'e3',a:'MC1-11',b:'MC2-6',type:'ctrl',d:[`M${M2} 330 V444`],note:'MC1이 쉬고 있을 때만 MC2 코일에 전원이 들어갑니다.'},
+    {id:'r1',a:'MC1-10',b:'RL-1',type:'ctrl',d:[`M${RLx} 110 V444`],note:'MC1이 동작하면 보조 a접점이 닫혀 RL이 켜집니다.'},
+    {id:'g1',a:'MC2-10',b:'GL-1',type:'ctrl',d:[`M${GLx} 110 V444`],note:'MC2가 동작하면 보조 a접점이 닫혀 GL이 켜집니다.'},
+    {id:'y1',a:'EOCR-5',b:'YL-1',type:'ctrl',d:[`M${EA} 330 V444`],note:'과부하로 EOCR이 트립하면 ⑩-⑤가 닫혀 YL이 켜집니다. EOCR을 리셋할 때까지 켜져 있어요.'},
+    {id:'n1',a:'EOCR-3',b:'EOCR-12',type:'ctrl',d:[`M120 85 H${Nx} V530 H${EP} V476`],note:'EOCR 앞단(L3)에서 제어회로 공통선을 따서 EOCR ⑫로 보냅니다.'},
+    {id:'n2',a:'EOCR-12',b:'YL-2',type:'ctrl',d:[`M${EP} 530 H${EA} V476`],note:N_NOTE},
+    {id:'n3',a:'YL-2',b:'MC1-12',type:'ctrl',d:[`M${EA} 530 H${S} V476`],note:N_NOTE},
+    {id:'n4',a:'MC1-12',b:'T1-7',type:'ctrl',d:[`M${S} 530 H${TS} V476`],note:N_NOTE},
+    {id:'n5',a:'T1-7',b:'MC2-12',type:'ctrl',d:[`M${TS} 530 H${M2} V476`],note:N_NOTE},
+    {id:'n6',a:'MC2-12',b:'T2-7',type:'ctrl',d:[`M${M2} 530 H${T2x} V476`],note:N_NOTE},
+    {id:'n7',a:'T2-7',b:'RL-2',type:'ctrl',d:[`M${T2x} 530 H${RLx} V476`],note:N_NOTE},
+    {id:'n8',a:'RL-2',b:'GL-2',type:'ctrl',d:[`M${RLx} 530 H${GLx} V476`],note:'RL과 GL은 같은 램프 박스 안이라 공통선을 함 안에서 건너 줍니다.'}
+  ];
+  const sym = ()=>{
+    let s='';
+    s+=`<circle class="fillp" cx="${EP}" cy="460" r="16"/>`+T_(EP,463,'EOCR','lbl c" style="font-size:8px')+term(EP,444)+term(EP,476);
+    s+=hContact(EB1,EB2,'b',{eocr:1,label:'EOCR'});
+    s+=hContact(PB1x,PB2x,'b',{pb:1,label:'PB0'});
+    s+=contact(EA,290,330,'a',{label:'EOCR',eocr:1});
+    s+=lamp(EA,'YL');
+    s+=contact(S,70,110,'a',{pb:1,label:'PB1',lx:22});
+    s+=contact(TS,70,110,'a',{label:'T1'});
+    s+=contact(S,200,240,'b',{label:'T1',timer:1});
+    s+=contact(TS,200,240,'b',{label:'T2',timer:1});
+    s+=contact(M2,200,240,'a',{label:'T1',timer:1,lx:22});
+    s+=contact(S,290,330,'b',{label:'MC2'})+coil(S,'MC1',true);
+    s+=coil(TS,'T1');
+    s+=contact(M2,290,330,'b',{label:'MC1'})+coil(M2,'MC2',true);
+    s+=coil(T2x,'T2');
+    s+=contact(RLx,70,110,'a',{label:'MC1'})+contact(GLx,70,110,'a',{label:'MC2'});
+    s+=lamp(RLx,'RL')+lamp(GLx,'GL');
+    return s;
+  };
+  const JN=[[40,70],[120,85],[40,180],[80,190],[120,200],[120,290],[80,300],[40,310],
+    [EP,40],[EP,250],[S,40],[TS,40],[RLx,40],[S,130],[TS,130],[M2,265],
+    [EP,530],[EA,530],[S,530],[TS,530],[M2,530],[T2x,530],[RLx,530]];
+  const LAYOUT = {
+    PBS:{x:40,y:40,order:['PB1','PB0']},
+    TBL:{x:488,y:50},
+    TBM:{x:40,y:292},
+    LAMPS:{x:350,y:296,order:['YL','GL','RL']},
+    SOCKETS:['T1','T2','MC1','MC2','EOCR']
+  };
+  const OPS=`<li><b>전원</b>: 3상 220V 중 EOCR 앞단의 L1·L3에서 제어 전원(AC 220V)을 받습니다. EOCR은 ⑥-⑫로 전원을 받아 전류를 감시합니다.</li>
+<li><b>기동</b>: PB1을 누르면 T2 한시 b접점을 거쳐 T1 코일이 여자되고 T1 순시 a접점(①-③)으로 자기유지됩니다. 동시에 T1 한시 b접점과 MC2 b접점을 거쳐 MC1이 여자되어 전동기가 정회전하고 RL이 켜집니다.</li>
+<li><b>역회전</b>: T1 설정 시간이 지나면 한시 b접점이 열려 MC1이 꺼지고(RL 소등), 한시 a접점이 닫혀 MC1 b접점을 거쳐 MC2가 여자됩니다. 전동기가 역회전하고 GL이 켜지며, T2 코일도 함께 여자됩니다.</li>
+<li><b>자동 정지</b>: T2 설정 시간이 지나면 T2 한시 b접점이 열려 T1이 꺼집니다. T1의 자기유지와 한시 a접점이 풀리므로 MC2·T2·GL이 모두 꺼지고 전동기가 멈춥니다.</li>
+<li><b>정지</b>: 운전 중 PB0을 누르면 언제든 모두 꺼집니다.</li>
+<li><b>과부하</b>: EOCR이 트립하면 b접점(⑩-④)이 열려 운전 회로 전체가 끊기고, a접점(⑩-⑤)이 닫혀 YL이 켜집니다.</li>
+<li><b>인터록</b>: MC1·MC2의 보조 b접점이 서로의 코일 회로에 들어 있어 두 접촉기가 동시에 들어가지 않습니다.</li>`;
+  return {title:'타이머(T1·T2)에 의한 전동기 정·역 운전 후 자동 정지와 과부하 표시(YL)',W:975,EL,WIRES,sym,JN,LAYOUT,OPS};
+})();
+
+/* ---------- 공개문제 4 : 도면 좌표 ---------- */
+const P4 = (()=>{
+  const Px=284, Nx=296, EP=330, EA=385, EB1=400, EB2=450, PB1x=465, PB2x=505, RLx=540, GLx=605, S=670, TS=745, B=820, BT=895;
+  const EL = {
+    EO_P:{comp:'EOCR',name:'EOCR 전원',ans:[6,12],slots:[[EP+19,433],[EP+19,487]]},
+    EO_B:{comp:'EOCR',name:'EOCR b접점 (윗줄 전원선)',ans:[10,4],alt:[[11,4]],slots:[[EB1+10,56],[EB2-10,56]]},
+    EO_A:{comp:'EOCR',name:'EOCR a접점 (YL)',ans:[10,5],alt:[[11,5]],slots:V(EA,290,330)},
+    M2_A:{comp:'MC2',name:'MC2 보조 a접점 (RL)',ans:[4,10],slots:V(RLx,70,110)},
+    M1_A:{comp:'MC1',name:'MC1 보조 a접점 (GL)',ans:[4,10],slots:V(GLx,70,110)},
+    T1_I:{comp:'T1',name:'T1 순시 a접점 (자기유지)',ans:[1,3],slots:V(TS,70,110)},
+    T2_B:{comp:'T2',name:'T2 한시 b접점',ans:[8,5],slots:V(S,200,240)},
+    M2_B:{comp:'MC2',name:'MC2 보조 b접점 (인터록)',ans:[5,11],slots:V(S,290,330)},
+    M1_C:{comp:'MC1',name:'MC1 코일',ans:[6,12],slots:C(S)},
+    T1_C:{comp:'T1',name:'T1 코일',ans:[2,7],slots:C(TS)},
+    T1_A:{comp:'T1',name:'T1 한시 a접점',ans:[8,6],slots:V(B,70,110)},
+    T2_I:{comp:'T2',name:'T2 순시 a접점 (자기유지)',ans:[1,3],slots:V(BT,70,110)},
+    M1_B:{comp:'MC1',name:'MC1 보조 b접점 (인터록)',ans:[5,11],slots:V(B,290,330)},
+    M2_C:{comp:'MC2',name:'MC2 코일',ans:[6,12],slots:C(B)},
+    T2_C:{comp:'T2',name:'T2 코일',ans:[2,7],slots:C(BT)}
+  };
+  const N_NOTE='L3 쪽 공통선입니다. 한 단자에 2가닥을 넘지 않도록 옆 기구로 건너가며 차례로 이어요.';
+  const WIRES = [
+    ...P1.WIRES.filter(w=>w.type==='main'),
+    {id:'p1',a:'EOCR-1',b:'EOCR-6',type:'ctrl',d:[`M40 70 H${Px} V40 H${EP} V444`],note:'EOCR 앞단(L1)에서 제어 전원을 따서 EOCR 전원 ⑥으로 보냅니다. EOCR ①에는 주회로선과 이 선, 2가닥이 물려요.'},
+    {id:'p2',a:'EOCR-6',b:'EOCR-10',type:'ctrl',d:[`M${EP} 40 H${EB1}`,`M${EP} 250 H${EA} V290`],note:'EOCR 접점 공통 ⑩을 전원선에 묶습니다. 도면의 b접점(⑩-④)과 a접점(⑩-⑤)은 같은 ⑩번 단자를 씁니다.'},
+    {id:'q1',a:'EOCR-4',b:'PB0-b1',type:'ctrl',d:[`M${EB2} 40 H${PB1x}`],note:'EOCR b접점을 지난 전원을 정지 버튼 PB0의 b접점으로 보냅니다.'},
+    {id:'q2',a:'PB0-b2',b:'MC2-4',type:'ctrl',d:[`M${PB2x} 40 H${RLx} V70`],note:'PB0을 지난 전원을 RL용 MC2 보조 a접점 ④로 보냅니다. 이 문제는 RL이 MC2, GL이 MC1에 붙어요.'},
+    {id:'q3',a:'MC2-4',b:'MC1-4',type:'ctrl',d:[`M${RLx} 40 H${GLx} V70`],note:'MC2 ④에서 GL용 MC1 ④로 건너 연결합니다.'},
+    {id:'q4',a:'MC1-4',b:'PB1-a1',type:'ctrl',d:[`M${GLx} 40 H${S} V70`],note:'같은 윗줄 전원을 기동 버튼 PB1 a접점 입력으로 보냅니다.'},
+    {id:'q5',a:'PB1-a1',b:'T1-1',type:'ctrl',d:[`M${S} 40 H${TS} V70`],note:'PB1 입력에서 T1 순시 a접점 ①로 건너 자기유지 회로를 만듭니다.'},
+    {id:'q6',a:'T1-1',b:'T1-8',type:'ctrl',d:[`M${TS} 40 H${B} V70`],note:'T1 한시 a접점 공통 ⑧도 윗줄 전원에서 받습니다. 같은 소켓 안 점퍼예요.'},
+    {id:'q7',a:'T1-8',b:'T2-1',type:'ctrl',d:[`M${B} 40 H${BT} V70`],note:'T2 순시 a접점 ①도 같은 전원선에서 받아 T2 자기유지 회로를 만듭니다.'},
+    {id:'c1',a:'PB1-a2',b:'T1-3',type:'ctrl',d:[`M${S} 110 V130 H${TS} V110`],note:'PB1 출력과 T1 순시 a접점 출력 ③을 한 점으로 묶습니다.'},
+    {id:'c2',a:'T1-3',b:'T2-8',type:'ctrl',d:[`M${S} 130 V200`],note:'자기유지된 전원을 T2 한시 b접점 공통 ⑧로 보냅니다.'},
+    {id:'d1',a:'T2-5',b:'MC2-5',type:'ctrl',d:[`M${S} 240 V290`],note:'T2 한시 b접점 출력을 MC2 보조 b접점(인터록)으로 보냅니다.'},
+    {id:'d2',a:'MC2-5',b:'T1-2',type:'ctrl',d:[`M${S} 265 H${TS} V444`],note:'T1 코일도 T2 한시 b접점을 지난 같은 점에서 받습니다. MC2 ⑤에서 T1 ②로 건너 줘요.'},
+    {id:'d3',a:'MC2-11',b:'MC1-6',type:'ctrl',d:[`M${S} 330 V444`],note:'MC2가 쉬고 있을 때만 MC1 코일에 전원이 들어갑니다.'},
+    {id:'e1',a:'T1-6',b:'T2-3',type:'ctrl',d:[`M${B} 110 V130 H${BT} V110`],note:'T1 한시 a접점 출력과 T2 순시 a접점 출력 ③을 한 점으로 묶습니다. T1이 꺼져도 T2가 스스로 전원을 유지해요.'},
+    {id:'e2',a:'T2-3',b:'MC1-5',type:'ctrl',d:[`M${B} 130 V290`],note:'이 점의 전원을 MC1 보조 b접점(인터록)으로 보냅니다.'},
+    {id:'e3',a:'MC1-5',b:'T2-2',type:'ctrl',d:[`M${B} 265 H${BT} V444`],note:'T2 코일도 같은 점에서 받습니다. MC1 ⑤에서 T2 ②로 건너 줘요.'},
+    {id:'e4',a:'MC1-11',b:'MC2-6',type:'ctrl',d:[`M${B} 330 V444`],note:'MC1이 꺼져 b접점이 닫혀야 MC2 코일에 전원이 들어갑니다.'},
+    {id:'r1',a:'MC2-10',b:'RL-1',type:'ctrl',d:[`M${RLx} 110 V444`],note:'MC2가 동작하면 보조 a접점이 닫혀 RL이 켜집니다.'},
+    {id:'g1',a:'MC1-10',b:'GL-1',type:'ctrl',d:[`M${GLx} 110 V444`],note:'MC1이 동작하면 보조 a접점이 닫혀 GL이 켜집니다.'},
+    {id:'y1',a:'EOCR-5',b:'YL-1',type:'ctrl',d:[`M${EA} 330 V444`],note:'과부하로 EOCR이 트립하면 ⑩-⑤가 닫혀 YL이 켜집니다. EOCR을 리셋할 때까지 켜져 있어요.'},
+    {id:'n1',a:'EOCR-3',b:'EOCR-12',type:'ctrl',d:[`M120 85 H${Nx} V530 H${EP} V476`],note:'EOCR 앞단(L3)에서 제어회로 공통선을 따서 EOCR ⑫로 보냅니다.'},
+    {id:'n2',a:'EOCR-12',b:'YL-2',type:'ctrl',d:[`M${EP} 530 H${EA} V476`],note:N_NOTE},
+    {id:'n3',a:'YL-2',b:'RL-2',type:'ctrl',d:[`M${EA} 530 H${RLx} V476`],note:'YL과 RL은 같은 램프 박스 안이라 공통선을 함 안에서 건너 줍니다.'},
+    {id:'n4',a:'RL-2',b:'GL-2',type:'ctrl',d:[`M${RLx} 530 H${GLx} V476`],note:'RL과 GL도 함 안에서 공통선을 건너 줍니다.'},
+    {id:'n5',a:'GL-2',b:'MC1-12',type:'ctrl',d:[`M${GLx} 530 H${S} V476`],note:N_NOTE},
+    {id:'n6',a:'MC1-12',b:'T1-7',type:'ctrl',d:[`M${S} 530 H${TS} V476`],note:N_NOTE},
+    {id:'n7',a:'T1-7',b:'MC2-12',type:'ctrl',d:[`M${TS} 530 H${B} V476`],note:N_NOTE},
+    {id:'n8',a:'MC2-12',b:'T2-7',type:'ctrl',d:[`M${B} 530 H${BT} V476`],note:N_NOTE}
+  ];
+  const sym = ()=>{
+    let s='';
+    s+=`<circle class="fillp" cx="${EP}" cy="460" r="16"/>`+T_(EP,463,'EOCR','lbl c" style="font-size:8px')+term(EP,444)+term(EP,476);
+    s+=hContact(EB1,EB2,'b',{eocr:1,label:'EOCR'});
+    s+=hContact(PB1x,PB2x,'b',{pb:1,label:'PB0'});
+    s+=contact(EA,290,330,'a',{label:'EOCR',eocr:1});
+    s+=lamp(EA,'YL');
+    s+=contact(RLx,70,110,'a',{label:'MC2'})+contact(GLx,70,110,'a',{label:'MC1'});
+    s+=lamp(RLx,'RL')+lamp(GLx,'GL');
+    s+=contact(S,70,110,'a',{pb:1,label:'PB1',lx:22});
+    s+=contact(TS,70,110,'a',{label:'T1'});
+    s+=contact(S,200,240,'b',{label:'T2',timer:1});
+    s+=contact(S,290,330,'b',{label:'MC2'})+coil(S,'MC1',true);
+    s+=coil(TS,'T1');
+    s+=contact(B,70,110,'a',{label:'T1',timer:1,lx:22});
+    s+=contact(BT,70,110,'a',{label:'T2'});
+    s+=contact(B,290,330,'b',{label:'MC1'})+coil(B,'MC2',true);
+    s+=coil(BT,'T2');
+    return s;
+  };
+  const JN=[[40,70],[120,85],[40,180],[80,190],[120,200],[120,290],[80,300],[40,310],
+    [EP,40],[EP,250],[RLx,40],[GLx,40],[S,40],[TS,40],[B,40],[S,130],[S,265],[B,130],[B,265],
+    [EP,530],[EA,530],[RLx,530],[GLx,530],[S,530],[TS,530],[B,530]];
+  const LAYOUT = {
+    LAMPS:{x:40,y:38,order:['YL','GL','RL']},
+    TBL:{x:488,y:50},
+    PBS:{x:40,y:290,order:['PB1','PB0']},
+    TBM:{x:488,y:292},
+    SOCKETS:['T1','T2','MC1','MC2','EOCR']
+  };
+  const OPS=`<li><b>전원</b>: 3상 220V 중 EOCR 앞단의 L1·L3에서 제어 전원(AC 220V)을 받습니다. EOCR은 ⑥-⑫로 전원을 받아 전류를 감시합니다. 이 문제는 <b>GL이 MC1, RL이 MC2</b> 표시등이에요.</li>
+<li><b>기동</b>: PB1을 누르면 T2 한시 b접점을 거쳐 T1 코일과 MC1이 함께 여자되고, T1 순시 a접점(①-③)으로 자기유지됩니다. 전동기가 정회전하고 GL이 켜집니다.</li>
+<li><b>T2 시작</b>: T1 설정 시간이 지나면 T1 한시 a접점이 닫혀 T2 코일이 여자되고, T2 순시 a접점(①-③)으로 자기유지됩니다. MC1이 동작 중이라 MC1 b접점이 열려 있어 MC2는 아직 들어가지 않아요.</li>
+<li><b>역회전</b>: T2 설정 시간이 지나면 T2 한시 b접점이 열려 MC1과 T1이 꺼집니다(GL 소등). MC1 b접점이 닫히므로 T2 자기유지 회로로 MC2가 여자되어 전동기가 역회전하고 RL이 켜집니다.</li>
+<li><b>정지</b>: PB0을 누르면 T2의 자기유지가 풀려 MC2·T2·RL이 모두 꺼집니다.</li>
+<li><b>과부하</b>: EOCR이 트립하면 b접점(⑩-④)이 열려 운전 회로 전체가 끊기고, a접점(⑩-⑤)이 닫혀 YL이 켜집니다.</li>
+<li><b>인터록</b>: MC1·MC2의 보조 b접점이 서로의 코일 회로에 들어 있어 두 접촉기가 동시에 들어가지 않습니다.</li>`;
+  return {title:'타이머(T1·T2) 자기유지에 의한 전동기 정회전 후 역회전 전환과 과부하 표시(YL)',W:940,EL,WIRES,sym,JN,LAYOUT,OPS};
+})();
+
+/* ---------- 공개문제 5 : 도면 좌표 ---------- */
+const P5 = (()=>{
+  const Px=284, Nx=296, EP=330, EA=385, EB1=400, EB2=450, PB1x=465, PB2x=505, S=540, TS=615, A=685, RLx=760, B=845, GLx=920;
+  const EL = {
+    EO_P:{comp:'EOCR',name:'EOCR 전원',ans:[6,12],slots:[[EP+19,433],[EP+19,487]]},
+    EO_B:{comp:'EOCR',name:'EOCR b접점 (윗줄 전원선)',ans:[10,4],alt:[[11,4]],slots:[[EB1+10,56],[EB2-10,56]]},
+    EO_A:{comp:'EOCR',name:'EOCR a접점 (YL)',ans:[10,5],alt:[[11,5]],slots:V(EA,290,330)},
+    T1_I:{comp:'T1',name:'T1 순시 a접점 (자기유지)',ans:[1,3],slots:V(TS,70,110)},
+    T1_C:{comp:'T1',name:'T1 코일',ans:[2,7],slots:C(S)},
+    T1_A:{comp:'T1',name:'T1 한시 a접점 (T2 쪽)',ans:[8,6],slots:V(TS,340,380)},
+    T2_C:{comp:'T2',name:'T2 코일',ans:[2,7],slots:C(TS)},
+    T2_B:{comp:'T2',name:'T2 한시 b접점 (MC1 쪽)',ans:[8,5],slots:V(A,70,110)},
+    T2_I:{comp:'T2',name:'T2 순시 a접점 (MC1 쪽)',ans:[1,3],slots:V(A,160,200)},
+    M2_B:{comp:'MC2',name:'MC2 보조 b접점 (인터록)',ans:[5,11],slots:V(A,330,370)},
+    M1_C:{comp:'MC1',name:'MC1 코일',ans:[6,12],slots:C(A)},
+    M1_A:{comp:'MC1',name:'MC1 보조 a접점 (RL)',ans:[4,10],slots:V(RLx,330,370)},
+    T2_A:{comp:'T2',name:'T2 한시 a접점 (MC2 쪽)',ans:[8,6],slots:V(B,70,110)},
+    M1_B:{comp:'MC1',name:'MC1 보조 b접점 (인터록)',ans:[5,11],slots:V(B,330,370)},
+    M2_C:{comp:'MC2',name:'MC2 코일',ans:[6,12],slots:C(B)},
+    M2_A:{comp:'MC2',name:'MC2 보조 a접점 (GL)',ans:[4,10],slots:V(GLx,330,370)}
+  };
+  const N_NOTE='L3 쪽 공통선입니다. 한 단자에 2가닥을 넘지 않도록 옆 기구로 건너가며 차례로 이어요.';
+  const WIRES = [
+    ...P1.WIRES.filter(w=>w.type==='main'),
+    {id:'p1',a:'EOCR-1',b:'EOCR-6',type:'ctrl',d:[`M40 70 H${Px} V40 H${EP} V444`],note:'EOCR 앞단(L1)에서 제어 전원을 따서 EOCR 전원 ⑥으로 보냅니다. EOCR ①에는 주회로선과 이 선, 2가닥이 물려요.'},
+    {id:'p2',a:'EOCR-6',b:'EOCR-10',type:'ctrl',d:[`M${EP} 40 H${EB1}`,`M${EP} 250 H${EA} V290`],note:'EOCR 접점 공통 ⑩을 전원선에 묶습니다. 도면의 b접점(⑩-④)과 a접점(⑩-⑤)은 같은 ⑩번 단자를 씁니다.'},
+    {id:'q1',a:'EOCR-4',b:'PB0-b1',type:'ctrl',d:[`M${EB2} 40 H${PB1x}`],note:'EOCR b접점을 지난 전원을 정지 버튼 PB0의 b접점으로 보냅니다.'},
+    {id:'q2',a:'PB0-b2',b:'PB1-a1',type:'ctrl',d:[`M${PB2x} 40 H${S} V70`],note:'PB0 b접점 출력을 PB1 a접점 입력에 잇습니다. 둘 다 같은 컨트롤 박스 안이라 함 안에서 짧게 건넙니다.'},
+    {id:'q3',a:'PB1-a1',b:'T1-1',type:'ctrl',d:[`M${S} 40 H${TS} V70`],note:'같은 윗줄 전원을 T1 순시 a접점 ①로 보내 자기유지 회로를 만듭니다.'},
+    {id:'q4',a:'T1-1',b:'T2-8',type:'ctrl',d:[`M${TS} 40 H${A} V70`,`M${A} 40 H${B} V70`],note:'T2 한시 접점 공통 ⑧도 윗줄 전원에서 받습니다. 한시 b(⑧-⑤)와 한시 a(⑧-⑥)는 공통 ⑧을 함께 써요.'},
+    {id:'c1',a:'PB1-a2',b:'T1-3',type:'ctrl',d:[`M${S} 110 V130 H${TS} V110`],note:'PB1 출력과 T1 순시 a접점 출력 ③을 한 점으로 묶습니다. PB1을 놓아도 T1이 스스로 전원을 유지해요.'},
+    {id:'c2',a:'T1-3',b:'T1-8',type:'ctrl',d:[`M${S} 130 V300 H${TS} V340`],note:'자기유지된 전원을 T1 한시 a접점 공통 ⑧로 보냅니다. 같은 소켓 안 점퍼예요.'},
+    {id:'c3',a:'T1-8',b:'T1-2',type:'ctrl',d:[`M${S} 300 V444`],note:'T1 코일 ②도 같은 점에서 받습니다.'},
+    {id:'t1',a:'T1-6',b:'T2-2',type:'ctrl',d:[`M${TS} 380 V444`],note:'T1 설정 시간이 지나 한시 a접점이 닫히면 T2 코일이 여자됩니다.'},
+    {id:'a1',a:'T2-5',b:'T2-1',type:'ctrl',d:[`M${A} 110 V160`],note:'T2 한시 b접점 출력을 T2 순시 a접점 ①로 보냅니다. 두 접점이 직렬이라, T2가 여자된 뒤 설정 시간 전까지만 닫혀 있어요.'},
+    {id:'a2',a:'T2-3',b:'MC2-5',type:'ctrl',d:[`M${A} 200 V330`],note:'T2 순시 a접점 출력을 MC2 보조 b접점(인터록)으로 보냅니다.'},
+    {id:'a3',a:'MC2-5',b:'MC1-4',type:'ctrl',d:[`M${A} 265 H${RLx} V330`],note:'RL용 MC1 보조 a접점 ④도 같은 점에서 받습니다. MC2 ⑤에서 MC1 ④로 건너 줘요.'},
+    {id:'a4',a:'MC2-11',b:'MC1-6',type:'ctrl',d:[`M${A} 370 V444`],note:'MC2가 쉬고 있을 때만 MC1 코일에 전원이 들어갑니다.'},
+    {id:'r1',a:'MC1-10',b:'RL-1',type:'ctrl',d:[`M${RLx} 370 V444`],note:'MC1이 동작하면 보조 a접점이 닫혀 RL이 켜집니다.'},
+    {id:'b1',a:'T2-6',b:'MC1-5',type:'ctrl',d:[`M${B} 110 V330`],note:'T2 설정 시간이 지나 한시 a접점이 닫히면 MC1 보조 b접점(인터록)으로 전원이 갑니다.'},
+    {id:'b2',a:'MC1-5',b:'MC2-4',type:'ctrl',d:[`M${B} 265 H${GLx} V330`],note:'GL용 MC2 보조 a접점 ④도 같은 점에서 받습니다. MC1 ⑤에서 MC2 ④로 건너 줘요.'},
+    {id:'b3',a:'MC1-11',b:'MC2-6',type:'ctrl',d:[`M${B} 370 V444`],note:'MC1이 쉬고 있을 때만 MC2 코일에 전원이 들어갑니다.'},
+    {id:'g1',a:'MC2-10',b:'GL-1',type:'ctrl',d:[`M${GLx} 370 V444`],note:'MC2가 동작하면 보조 a접점이 닫혀 GL이 켜집니다.'},
+    {id:'y1',a:'EOCR-5',b:'YL-1',type:'ctrl',d:[`M${EA} 330 V444`],note:'과부하로 EOCR이 트립하면 ⑩-⑤가 닫혀 YL이 켜집니다. EOCR을 리셋할 때까지 켜져 있어요.'},
+    {id:'n1',a:'EOCR-3',b:'EOCR-12',type:'ctrl',d:[`M120 85 H${Nx} V530 H${EP} V476`],note:'EOCR 앞단(L3)에서 제어회로 공통선을 따서 EOCR ⑫로 보냅니다.'},
+    {id:'n2',a:'EOCR-12',b:'YL-2',type:'ctrl',d:[`M${EP} 530 H${EA} V476`],note:N_NOTE},
+    {id:'n3',a:'YL-2',b:'T1-7',type:'ctrl',d:[`M${EA} 530 H${S} V476`],note:N_NOTE},
+    {id:'n4',a:'T1-7',b:'T2-7',type:'ctrl',d:[`M${S} 530 H${TS} V476`],note:N_NOTE},
+    {id:'n5',a:'T2-7',b:'MC1-12',type:'ctrl',d:[`M${TS} 530 H${A} V476`],note:N_NOTE},
+    {id:'n6',a:'MC1-12',b:'RL-2',type:'ctrl',d:[`M${A} 530 H${RLx} V476`],note:N_NOTE},
+    {id:'n7',a:'RL-2',b:'MC2-12',type:'ctrl',d:[`M${RLx} 530 H${B} V476`],note:N_NOTE},
+    {id:'n8',a:'MC2-12',b:'GL-2',type:'ctrl',d:[`M${B} 530 H${GLx} V476`],note:N_NOTE}
+  ];
+  const sym = ()=>{
+    let s='';
+    s+=`<circle class="fillp" cx="${EP}" cy="460" r="16"/>`+T_(EP,463,'EOCR','lbl c" style="font-size:8px')+term(EP,444)+term(EP,476);
+    s+=hContact(EB1,EB2,'b',{eocr:1,label:'EOCR'});
+    s+=hContact(PB1x,PB2x,'b',{pb:1,label:'PB0'});
+    s+=contact(EA,290,330,'a',{label:'EOCR',eocr:1});
+    s+=lamp(EA,'YL');
+    s+=contact(S,70,110,'a',{pb:1,label:'PB1',lx:22});
+    s+=contact(TS,70,110,'a',{label:'T1'});
+    s+=coil(S,'T1');
+    s+=contact(TS,340,380,'a',{label:'T1',timer:1,lx:22});
+    s+=coil(TS,'T2');
+    s+=contact(A,70,110,'b',{label:'T2',timer:1});
+    s+=contact(A,160,200,'a',{label:'T2'});
+    s+=contact(A,330,370,'b',{label:'MC2'})+coil(A,'MC1',true);
+    s+=contact(RLx,330,370,'a',{label:'MC1'})+lamp(RLx,'RL');
+    s+=contact(B,70,110,'a',{label:'T2',timer:1,lx:22});
+    s+=contact(B,330,370,'b',{label:'MC1'})+coil(B,'MC2',true);
+    s+=contact(GLx,330,370,'a',{label:'MC2'})+lamp(GLx,'GL');
+    return s;
+  };
+  const JN=[[40,70],[120,85],[40,180],[80,190],[120,200],[120,290],[80,300],[40,310],
+    [EP,40],[EP,250],[S,40],[TS,40],[A,40],[S,130],[S,300],[A,265],[B,265],
+    [EP,530],[EA,530],[S,530],[TS,530],[A,530],[RLx,530],[B,530]];
+  const LAYOUT = {
+    PBS:{x:40,y:40,order:['PB1','PB0']},
+    TBL:{x:488,y:50},
+    LAMPS:{x:40,y:296,order:['YL','RL','GL']},
+    TBM:{x:488,y:292},
+    SOCKETS:['T1','T2','MC1','MC2','EOCR']
+  };
+  const OPS=`<li><b>전원</b>: 3상 220V 중 EOCR 앞단의 L1·L3에서 제어 전원(AC 220V)을 받습니다. EOCR은 ⑥-⑫로 전원을 받아 전류를 감시합니다.</li>
+<li><b>기동</b>: PB1을 누르면 T1 코일이 여자되고 T1 순시 a접점(①-③)으로 자기유지됩니다. 이때 전동기는 아직 돌지 않아요.</li>
+<li><b>정회전</b>: T1 설정 시간이 지나면 T1 한시 a접점이 닫혀 T2가 여자됩니다. T2 순시 a접점이 닫히고 한시 b접점은 아직 닫혀 있으므로, MC2 b접점을 거쳐 MC1이 여자되어 전동기가 정회전하고 RL이 켜집니다.</li>
+<li><b>역회전</b>: T2 설정 시간이 지나면 T2 한시 b접점이 열려 MC1이 꺼지고(RL 소등), T2 한시 a접점이 닫혀 MC1 b접점을 거쳐 MC2가 여자됩니다. 전동기가 역회전하고 GL이 켜집니다.</li>
+<li><b>정지</b>: PB0을 누르면 T1의 자기유지가 풀려 T1·T2·MC2·GL이 모두 꺼집니다.</li>
+<li><b>과부하</b>: EOCR이 트립하면 b접점(⑩-④)이 열려 운전 회로 전체가 끊기고, a접점(⑩-⑤)이 닫혀 YL이 켜집니다.</li>
+<li><b>인터록</b>: MC1·MC2의 보조 b접점이 서로의 코일 회로에 들어 있어 두 접촉기가 동시에 들어가지 않습니다.</li>`;
+  return {title:'타이머(T1·T2)에 의한 지연 정회전 후 역회전 전환과 과부하 표시(YL)',W:975,EL,WIRES,sym,JN,LAYOUT,OPS};
+})();
+
+/* ---------- 공개문제 6 : Y-Δ 기동 ---------- */
+const P6 = (()=>{
+  const Px=284, Nx=296, EP=330, EA=400, YLx=460, EB1=400, EB2=450, PB1x=465, PB2x=505, S=545, TS=620, M2=690, RLx=760, GLx=830;
+  const ELM = {
+    EO_R:{comp:'EOCR',name:'EOCR 주회로 (L1)',ans:[1,7],exact:true,slots:[[26,100],[26,150]]},
+    EO_S:{comp:'EOCR',name:'EOCR 주회로 (L2)',ans:[2,8],exact:true,slots:[[66,100],[66,150]]},
+    EO_T:{comp:'EOCR',name:'EOCR 주회로 (L3)',ans:[3,9],exact:true,slots:[[106,100],[106,150]]},
+    M2_R:{comp:'MC2',name:'MC2 주접점 (L1 → Z)',ans:[1,7],exact:true,slots:[[174,238],[174,262]]},
+    M2_S:{comp:'MC2',name:'MC2 주접점 (L2 → X)',ans:[2,8],exact:true,slots:[[214,238],[214,262]]},
+    M2_T:{comp:'MC2',name:'MC2 주접점 (L3 → Y)',ans:[3,9],exact:true,slots:[[254,238],[254,262]]},
+    M1_R:{comp:'MC1',name:'MC1 주접점 (X 쪽)',ans:[1,7],exact:true,slots:[[24,388],[24,412]]},
+    M1_S:{comp:'MC1',name:'MC1 주접점 (Y 쪽)',ans:[2,8],exact:true,slots:[[64,388],[64,412]]},
+    M1_T:{comp:'MC1',name:'MC1 주접점 (Z 쪽)',ans:[3,9],exact:true,slots:[[104,388],[104,412]]}
+  };
+  const EL = {
+    EO_P:{comp:'EOCR',name:'EOCR 전원',ans:[6,12],slots:[[EP+19,433],[EP+19,487]]},
+    EO_B:{comp:'EOCR',name:'EOCR b접점 (윗줄 전원선)',ans:[10,4],alt:[[11,4]],slots:[[EB1+10,56],[EB2-10,56]]},
+    EO_A:{comp:'EOCR',name:'EOCR a접점 (경보)',ans:[10,5],alt:[[11,5]],slots:V(EA,110,150)},
+    FR_C:{comp:'FR',name:'FR 코일 (전원)',ans:[2,7],slots:C(EA)},
+    FR_B:{comp:'FR',name:'FR b접점 (YL 점멸)',ans:[8,5],slots:V(YLx,290,330)},
+    T_I:{comp:'T',name:'T 순시 a접점 (자기유지)',ans:[1,3],slots:V(TS,70,110)},
+    T_C:{comp:'T',name:'T 코일',ans:[2,7],slots:C(S)},
+    T_B:{comp:'T',name:'T 한시 b접점 (MC1 쪽)',ans:[8,5],slots:V(TS,200,240)},
+    T_A:{comp:'T',name:'T 한시 a접점 (MC2 쪽)',ans:[8,6],slots:V(M2,200,240)},
+    M2_B:{comp:'MC2',name:'MC2 보조 b접점 (인터록)',ans:[5,11],slots:V(TS,290,330)},
+    M1_C:{comp:'MC1',name:'MC1 코일',ans:[6,12],slots:C(TS)},
+    M1_B:{comp:'MC1',name:'MC1 보조 b접점 (인터록)',ans:[5,11],slots:V(M2,290,330)},
+    M2_C:{comp:'MC2',name:'MC2 코일',ans:[6,12],slots:C(M2)},
+    M1_A:{comp:'MC1',name:'MC1 보조 a접점 (RL)',ans:[4,10],slots:V(RLx,70,110)},
+    M2_A:{comp:'MC2',name:'MC2 보조 a접점 (GL)',ans:[4,10],slots:V(GLx,70,110)}
+  };
+  const N_NOTE='L3 쪽 공통선입니다. 한 단자에 2가닥을 넘지 않도록 옆 기구로 건너가며 차례로 이어요.';
+  const WIRES = [
+    {id:'m1',a:'TBL-L1',b:'EOCR-1',type:'main',d:['M40 30 V110'],note:'전원 단자대 L1을 EOCR ①로 보냅니다. MCCB는 생략하고 직결해요.'},
+    {id:'m2',a:'TBL-L2',b:'EOCR-2',type:'main',d:['M80 30 V110']},
+    {id:'m3',a:'TBL-L3',b:'EOCR-3',type:'main',d:['M120 30 V110']},
+    {id:'m4',a:'EOCR-7',b:'TBM-U',type:'main',d:['M40 140 V200'],note:'EOCR 출력 L1을 전동기 U로 바로 보냅니다. U V W는 늘 전원에 붙어 있고, X Y Z를 어떻게 잇느냐로 Y·Δ가 정해져요.'},
+    {id:'m5',a:'EOCR-8',b:'TBM-V',type:'main',d:['M80 140 V200']},
+    {id:'m6',a:'EOCR-9',b:'TBM-W',type:'main',d:['M120 140 V200']},
+    {id:'m7',a:'EOCR-7',b:'MC2-1',type:'main',d:['M40 185 H190 V230'],note:'EOCR 출력 L1을 Δ용 MC2 ①로도 보냅니다. EOCR ⑦에는 2가닥이 물려요.'},
+    {id:'m8',a:'EOCR-8',b:'MC2-2',type:'main',d:['M80 175 H230 V230']},
+    {id:'m9',a:'EOCR-9',b:'MC2-3',type:'main',d:['M120 165 H270 V230']},
+    {id:'m10',a:'MC2-7',b:'TBX-Z',type:'main',d:['M190 270 V320 H120'],note:'Δ 결선: MC2 ⑦(L1)을 Z로 보냅니다. U-Z가 같은 L1이 되어 권선이 삼각형으로 이어져요.'},
+    {id:'m11',a:'MC2-8',b:'TBX-X',type:'main',d:['M230 270 V330 H40'],note:'Δ 결선: MC2 ⑧(L2)을 X로 보냅니다.'},
+    {id:'m12',a:'MC2-9',b:'TBX-Y',type:'main',d:['M270 270 V340 H80'],note:'Δ 결선: MC2 ⑨(L3)를 Y로 보냅니다.'},
+    {id:'m13',a:'TBX-X',b:'MC1-1',type:'main',d:['M40 300 V380'],note:'Y 결선용: X를 MC1 ①로 보냅니다.'},
+    {id:'m14',a:'TBX-Y',b:'MC1-2',type:'main',d:['M80 300 V380'],note:'Y 결선용: Y를 MC1 ②로 보냅니다.'},
+    {id:'m15',a:'TBX-Z',b:'MC1-3',type:'main',d:['M120 300 V380'],note:'Y 결선용: Z를 MC1 ③으로 보냅니다.'},
+    {id:'m16',a:'MC1-7',b:'MC1-8',type:'main',d:['M40 420 V435 H80 V420'],note:'MC1 출력 ⑦·⑧·⑨를 서로 묶어 중성점을 만듭니다. MC1이 들어가면 X Y Z가 한 점으로 모여 Y 결선이 돼요.'},
+    {id:'m17',a:'MC1-8',b:'MC1-9',type:'main',d:['M80 435 H120 V420'],note:'⑧에서 ⑨로 건너 중성점 단락을 마칩니다.'},
+    {id:'p1',a:'EOCR-1',b:'EOCR-6',type:'ctrl',d:[`M40 70 H${Px} V40 H${EP} V444`],note:'EOCR 앞단(L1)에서 제어 전원을 따서 EOCR 전원 ⑥으로 보냅니다. EOCR ①에는 주회로선과 이 선, 2가닥이 물려요.'},
+    {id:'p2',a:'EOCR-6',b:'EOCR-10',type:'ctrl',d:[`M${EP} 40 H${EB1}`,`M${EP} 100 H${EA} V110`],note:'EOCR 접점 공통 ⑩을 전원선에 묶습니다. 도면의 b접점(⑩-④)과 a접점(⑩-⑤)은 같은 ⑩번 단자를 씁니다.'},
+    {id:'q1',a:'EOCR-4',b:'PB0-b1',type:'ctrl',d:[`M${EB2} 40 H${PB1x}`],note:'EOCR b접점을 지난 전원을 정지 버튼 PB0의 b접점으로 보냅니다.'},
+    {id:'q2',a:'PB0-b2',b:'PB1-a1',type:'ctrl',d:[`M${PB2x} 40 H${S} V70`],note:'PB0 b접점 출력을 PB1 a접점 입력에 잇습니다. 둘 다 같은 컨트롤 박스 안이라 함 안에서 짧게 건넙니다.'},
+    {id:'q3',a:'PB1-a1',b:'T-1',type:'ctrl',d:[`M${S} 40 H${TS} V70`],note:'같은 윗줄 전원을 T 순시 a접점 ①로 보내 자기유지 회로를 만듭니다.'},
+    {id:'q4',a:'T-1',b:'MC1-4',type:'ctrl',d:[`M${TS} 40 H${RLx} V70`],note:'RL용 MC1 보조 a접점 ④도 같은 전원선에서 받습니다.'},
+    {id:'q5',a:'MC1-4',b:'MC2-4',type:'ctrl',d:[`M${RLx} 40 H${GLx} V70`],note:'MC1 ④에서 MC2 ④로 건너 연결합니다.'},
+    {id:'c1',a:'PB1-a2',b:'T-3',type:'ctrl',d:[`M${S} 110 V130 H${TS} V110`],note:'PB1 출력과 T 순시 a접점 출력 ③을 한 점으로 묶습니다. PB1을 놓아도 T가 스스로 전원을 유지해요.'},
+    {id:'c2',a:'T-3',b:'T-8',type:'ctrl',d:[`M${S} 130 V160 H${TS} V200`,`M${TS} 160 H${M2} V200`],note:'자기유지된 전원을 T 한시 접점 공통 ⑧로 보냅니다. 한시 b(⑧-⑤)와 한시 a(⑧-⑥)는 공통 ⑧을 함께 써요.'},
+    {id:'c3',a:'T-8',b:'T-2',type:'ctrl',d:[`M${S} 160 V444`],note:'T 코일 ②도 같은 점에서 받습니다. 같은 소켓 안 점퍼예요.'},
+    {id:'d1',a:'T-5',b:'MC2-5',type:'ctrl',d:[`M${TS} 240 V290`],note:'T 한시 b접점 출력을 MC2 보조 b접점(인터록)으로 보냅니다.'},
+    {id:'d2',a:'MC2-11',b:'MC1-6',type:'ctrl',d:[`M${TS} 330 V444`],note:'T 설정 시간 전이고 MC2가 쉬고 있을 때 MC1(Y 기동) 코일에 전원이 들어갑니다.'},
+    {id:'e1',a:'T-6',b:'MC1-5',type:'ctrl',d:[`M${M2} 240 V290`],note:'T 한시 a접점 출력을 MC1 보조 b접점(인터록)으로 보냅니다.'},
+    {id:'e2',a:'MC1-11',b:'MC2-6',type:'ctrl',d:[`M${M2} 330 V444`],note:'MC1이 꺼져 b접점이 닫혀야 MC2(Δ 운전) 코일에 전원이 들어갑니다.'},
+    {id:'r1',a:'MC1-10',b:'RL-1',type:'ctrl',d:[`M${RLx} 110 V444`],note:'MC1(Y 기동)이 동작하면 보조 a접점이 닫혀 RL이 켜집니다.'},
+    {id:'g1',a:'MC2-10',b:'GL-1',type:'ctrl',d:[`M${GLx} 110 V444`],note:'MC2(Δ 운전)가 동작하면 보조 a접점이 닫혀 GL이 켜집니다.'},
+    {id:'a1',a:'EOCR-5',b:'FR-2',type:'ctrl',d:[`M${EA} 150 V444`],note:'과부하로 EOCR이 트립하면 ⑩-⑤가 닫혀 FR(플리커 릴레이)에 전원이 들어갑니다.'},
+    {id:'a2',a:'FR-2',b:'FR-8',type:'ctrl',d:[`M${EA} 200 H${YLx} V290`],note:'FR b접점 공통 ⑧도 같은 점에서 받습니다. 같은 소켓 안 점퍼예요.'},
+    {id:'y1',a:'FR-5',b:'YL-1',type:'ctrl',d:[`M${YLx} 330 V444`],note:'FR b접점이 일정 주기로 열리고 닫혀 YL이 깜빡입니다.'},
+    {id:'n1',a:'EOCR-3',b:'EOCR-12',type:'ctrl',d:[`M120 85 H${Nx} V530 H${EP} V476`],note:'EOCR 앞단(L3)에서 제어회로 공통선을 따서 EOCR ⑫로 보냅니다.'},
+    {id:'n2',a:'EOCR-12',b:'FR-7',type:'ctrl',d:[`M${EP} 530 H${EA} V476`],note:N_NOTE},
+    {id:'n3',a:'FR-7',b:'YL-2',type:'ctrl',d:[`M${EA} 530 H${YLx} V476`],note:N_NOTE},
+    {id:'n4',a:'YL-2',b:'T-7',type:'ctrl',d:[`M${YLx} 530 H${S} V476`],note:N_NOTE},
+    {id:'n5',a:'T-7',b:'MC1-12',type:'ctrl',d:[`M${S} 530 H${TS} V476`],note:N_NOTE},
+    {id:'n6',a:'MC1-12',b:'MC2-12',type:'ctrl',d:[`M${TS} 530 H${M2} V476`],note:N_NOTE},
+    {id:'n7',a:'MC2-12',b:'RL-2',type:'ctrl',d:[`M${M2} 530 H${RLx} V476`],note:N_NOTE},
+    {id:'n8',a:'RL-2',b:'GL-2',type:'ctrl',d:[`M${RLx} 530 H${GLx} V476`],note:'RL과 GL은 같은 램프 박스 안이라 공통선을 함 안에서 건너 줍니다.'}
+  ];
+  const mainSym = ()=>{
+    let s='';
+    [40,80,120].forEach((x,i)=>{ s+=`<rect class="fillp" x="${x-5}" y="20" width="10" height="10"/>`+T_(x,14,['L1','L2','L3'][i],'lbl c sm'); });
+    s+=T_(134,29,'3P3W AC 220V','tag')+T_(134,60,'MCCB 생략 (직결)','tag');
+    s+=`<rect class="fillp" x="22" y="110" width="116" height="30" rx="2"/>`;
+    [40,80,120].forEach(x=>s+=L(x,110,x,140)+`<circle class="fillp" cx="${x}" cy="125" r="5"/>`+term(x,110)+term(x,140));
+    s+=T_(146,130,'EOCR','lbl sm');
+    [190,230,270].forEach(x=>s+=mainContact(x,230,270)); s+=L(195.5,251.5,280,251.5,'dash')+T_(284,247,'MC2','lbl sm')+T_(284,262,'(Δ)','tag');
+    [40,80,120].forEach((x,i)=>{ s+=`<rect class="fillp" x="${x-5}" y="200" width="10" height="10"/>`+T_(x+8,209,['U','V','W'][i],'tag'); });
+    s+=`<path d="M40 210 V216 L64 236"/><path d="M80 210 V230"/><path d="M120 210 V216 L96 236"/><circle class="fillp" cx="80" cy="250" r="20"/>`+T_(80,255,'M','lbl c');
+    s+=`<path d="M64 264 L40 280 V290"/><path d="M80 270 V290"/><path d="M96 264 L120 280 V290"/>`;
+    [40,80,120].forEach((x,i)=>{ s+=`<rect class="fillp" x="${x-5}" y="290" width="10" height="10"/>`+T_(x+8,299,['X','Y','Z'][i],'tag'); });
+    [40,80,120].forEach(x=>s+=mainContact(x,380,420)); s+=L(45.5,401.5,128,401.5,'dash')+T_(134,406,'MC1 (Y)','lbl sm');
+    return s;
+  };
+  const sym = ()=>{
+    let s='';
+    s+=`<circle class="fillp" cx="${EP}" cy="460" r="16"/>`+T_(EP,463,'EOCR','lbl c" style="font-size:8px')+term(EP,444)+term(EP,476);
+    s+=hContact(EB1,EB2,'b',{eocr:1,label:'EOCR'});
+    s+=hContact(PB1x,PB2x,'b',{pb:1,label:'PB0'});
+    s+=contact(EA,110,150,'a',{label:'EOCR',eocr:1});
+    s+=coil(EA,'FR');
+    s+=contact(YLx,290,330,'b',{label:'FR',flicker:1,lx:18});
+    s+=lamp(YLx,'YL');
+    s+=contact(S,70,110,'a',{pb:1,label:'PB1',lx:22});
+    s+=contact(TS,70,110,'a',{label:'T'});
+    s+=coil(S,'T');
+    s+=contact(TS,200,240,'b',{label:'T',timer:1});
+    s+=contact(M2,200,240,'a',{label:'T',timer:1,lx:22});
+    s+=contact(TS,290,330,'b',{label:'MC2'})+coil(TS,'MC1',true);
+    s+=contact(M2,290,330,'b',{label:'MC1'})+coil(M2,'MC2',true);
+    s+=contact(RLx,70,110,'a',{label:'MC1'})+contact(GLx,70,110,'a',{label:'MC2'});
+    s+=lamp(RLx,'RL')+lamp(GLx,'GL');
+    return s;
+  };
+  const JN=[[40,70],[120,85],[120,165],[80,175],[40,185],[120,320],[40,330],[80,340],[80,435],
+    [EP,40],[EP,100],[S,40],[TS,40],[RLx,40],[EA,200],[S,130],[S,160],[TS,160],
+    [EP,530],[EA,530],[YLx,530],[S,530],[TS,530],[M2,530],[RLx,530]];
+  const LAYOUT = {
+    TBL:{x:40,y:50},
+    LAMPS:{x:350,y:38,order:['RL','GL','YL']},
+    TBM:{x:40,y:292},
+    TBX:{x:150,y:292},
+    PBS:{x:420,y:290,order:['PB0','PB1']},
+    SOCKETS:['EOCR','MC1','MC2','T','FR']
+  };
+  const OPS=`<li><b>전원</b>: 3상 220V 중 EOCR 앞단의 L1·L3에서 제어 전원(AC 220V)을 받습니다. EOCR은 ⑥-⑫로 전원을 받아 전류를 감시합니다.</li>
+<li><b>주회로</b>: 전동기 U V W는 EOCR 출력에 바로 붙어 있습니다. MC1이 들어가면 X Y Z가 한 점으로 묶여 <b>Y 결선</b>, MC2가 들어가면 X Y Z에 각각 L2·L3·L1이 들어가 <b>Δ 결선</b>이 됩니다.</li>
+<li><b>Y 기동</b>: PB1을 누르면 T 코일이 여자되고 T 순시 a접점(①-③)으로 자기유지됩니다. T 한시 b접점과 MC2 b접점을 거쳐 MC1이 여자되어 전동기가 Y 결선으로 기동하고 RL이 켜집니다.</li>
+<li><b>Δ 운전</b>: T 설정 시간이 지나면 한시 b접점이 열려 MC1이 꺼지고(RL 소등), 한시 a접점이 닫혀 MC1 b접점을 거쳐 MC2가 여자됩니다. 전동기가 Δ 결선으로 운전하고 GL이 켜집니다.</li>
+<li><b>정지</b>: PB0을 누르면 T의 자기유지가 풀려 MC2·GL이 모두 꺼집니다.</li>
+<li><b>과부하</b>: EOCR이 트립하면 b접점(⑩-④)이 열려 운전 회로 전체가 끊기고, a접점(⑩-⑤)이 닫혀 FR이 동작합니다. FR b접점이 주기적으로 열리고 닫혀 YL이 깜빡입니다.</li>
+<li><b>인터록</b>: MC1·MC2의 보조 b접점이 서로의 코일 회로에 들어 있어 Y와 Δ가 동시에 들어가지 않습니다(동시에 들어가면 단락).</li>`;
+  return {title:'타이머(T)에 의한 전동기 Y-Δ 기동과 과부하 점멸 경보(FR·YL)',W:880,ELM,EL,WIRES,sym,mainSym,JN,LAYOUT,OPS};
+})();
+
+/* ---------- 공개문제 7 : Y-Δ 기동 + FR 교대 점멸 ---------- */
+const P7 = (()=>{
+  const Px=284, Nx=296, EP=330, EA=385, EB1=400, EB2=450, S=540, TS=620, M2=690, RLx=760, GLx=830, FRx=900;
+  const EL = {
+    EO_P:{comp:'EOCR',name:'EOCR 전원',ans:[6,12],slots:[[EP+19,433],[EP+19,487]]},
+    EO_B:{comp:'EOCR',name:'EOCR b접점 (윗줄 전원선)',ans:[10,4],alt:[[11,4]],slots:[[EB1+10,56],[EB2-10,56]]},
+    EO_A:{comp:'EOCR',name:'EOCR a접점 (YL)',ans:[10,5],alt:[[11,5]],slots:V(EA,290,330)},
+    T_I:{comp:'T',name:'T 순시 a접점 (자기유지)',ans:[1,3],slots:V(TS,70,110)},
+    T_C:{comp:'T',name:'T 코일',ans:[2,7],slots:C(S)},
+    T_B:{comp:'T',name:'T 한시 b접점 (MC1 쪽)',ans:[8,5],slots:V(TS,200,240)},
+    T_A:{comp:'T',name:'T 한시 a접점 (MC2 쪽)',ans:[8,6],slots:V(M2,200,240)},
+    M2_B:{comp:'MC2',name:'MC2 보조 b접점 (인터록)',ans:[5,11],slots:V(TS,290,330)},
+    M1_C:{comp:'MC1',name:'MC1 코일',ans:[6,12],slots:C(TS)},
+    M1_B:{comp:'MC1',name:'MC1 보조 b접점 (인터록)',ans:[5,11],slots:V(M2,290,330)},
+    M2_C:{comp:'MC2',name:'MC2 코일',ans:[6,12],slots:C(M2)},
+    M1_A:{comp:'MC1',name:'MC1 보조 a접점 (RL)',ans:[4,10],slots:V(RLx,70,110)},
+    FR_A:{comp:'FR',name:'FR a접점 (RL 쪽)',ans:[6,8],slots:V(GLx,200,240)},
+    FR_B:{comp:'FR',name:'FR b접점 (GL 쪽)',ans:[8,5],slots:V(GLx,290,330)},
+    M2_A:{comp:'MC2',name:'MC2 보조 a접점 (FR)',ans:[4,10],slots:V(FRx,70,110)},
+    FR_C:{comp:'FR',name:'FR 코일 (전원)',ans:[2,7],slots:C(FRx)}
+  };
+  const N_NOTE='L3 쪽 공통선입니다. 한 단자에 2가닥을 넘지 않도록 옆 기구로 건너가며 차례로 이어요.';
+  const WIRES = [
+    ...P6.WIRES.filter(w=>w.type==='main'),
+    {id:'p1',a:'EOCR-1',b:'EOCR-6',type:'ctrl',d:[`M40 70 H${Px} V40 H${EP} V444`],note:'EOCR 앞단(L1)에서 제어 전원을 따서 EOCR 전원 ⑥으로 보냅니다. EOCR ①에는 주회로선과 이 선, 2가닥이 물려요.'},
+    {id:'p2',a:'EOCR-6',b:'EOCR-10',type:'ctrl',d:[`M${EP} 40 H${EB1}`,`M${EP} 250 H${EA} V290`],note:'EOCR 접점 공통 ⑩을 전원선에 묶습니다. 도면의 b접점(⑩-④)과 a접점(⑩-⑤)은 같은 ⑩번 단자를 씁니다.'},
+    {id:'q1',a:'EOCR-4',b:'PB1-a1',type:'ctrl',d:[`M${EB2} 40 H${S} V70`],note:'이 문제는 윗줄 전원선에 PB0이 없습니다. EOCR b접점을 지난 전원을 바로 기동 버튼 PB1 a접점으로 보냅니다.'},
+    {id:'q2',a:'PB1-a1',b:'T-1',type:'ctrl',d:[`M${S} 40 H${TS} V70`],note:'같은 윗줄 전원을 T 순시 a접점 ①로 보내 자기유지 회로를 만듭니다.'},
+    {id:'q3',a:'T-1',b:'MC1-4',type:'ctrl',d:[`M${TS} 40 H${RLx} V70`],note:'MC1 보조 a접점 ④도 같은 전원선에서 받습니다.'},
+    {id:'q4',a:'MC1-4',b:'MC2-4',type:'ctrl',d:[`M${RLx} 40 H${FRx} V70`],note:'MC1 ④에서 FR용 MC2 보조 a접점 ④로 건너 연결합니다.'},
+    {id:'c1',a:'PB1-a2',b:'T-3',type:'ctrl',d:[`M${S} 110 V130 H${TS} V110`],note:'PB1 출력과 T 순시 a접점 출력 ③을 한 점으로 묶습니다.'},
+    {id:'c2',a:'T-3',b:'T-8',type:'ctrl',d:[`M${S} 130 V160 H${TS} V200`,`M${TS} 160 H${M2} V200`],note:'자기유지된 전원을 T 한시 접점 공통 ⑧로 보냅니다. 한시 b(⑧-⑤)와 한시 a(⑧-⑥)는 공통 ⑧을 함께 써요.'},
+    {id:'c3',a:'T-8',b:'PB0-b1',type:'ctrl',d:[`M${S} 160 V200`],note:'같은 점에서 정지 버튼 PB0 b접점으로 보냅니다. 이 문제는 PB0이 T 코일 바로 앞에 있어요.'},
+    {id:'c4',a:'PB0-b2',b:'T-2',type:'ctrl',d:[`M${S} 240 V444`],note:'PB0을 지나 T 코일 ②로 갑니다. PB0을 누르면 T가 꺼지면서 순시 a접점의 자기유지도 풀려 전체가 정지합니다.'},
+    {id:'d1',a:'T-5',b:'MC2-5',type:'ctrl',d:[`M${TS} 240 V290`],note:'T 한시 b접점 출력을 MC2 보조 b접점(인터록)으로 보냅니다.'},
+    {id:'d2',a:'MC2-11',b:'MC1-6',type:'ctrl',d:[`M${TS} 330 V444`],note:'T 설정 시간 전이고 MC2가 쉬고 있을 때 MC1(Y 기동) 코일에 전원이 들어갑니다.'},
+    {id:'e1',a:'T-6',b:'MC1-5',type:'ctrl',d:[`M${M2} 240 V290`],note:'T 한시 a접점 출력을 MC1 보조 b접점(인터록)으로 보냅니다.'},
+    {id:'e2',a:'MC1-11',b:'MC2-6',type:'ctrl',d:[`M${M2} 330 V444`],note:'MC1이 꺼져 b접점이 닫혀야 MC2(Δ 운전) 코일에 전원이 들어갑니다.'},
+    {id:'r1',a:'MC1-10',b:'RL-1',type:'ctrl',d:[`M${RLx} 110 V444`],note:'MC1(Y 기동)이 동작하면 보조 a접점이 닫혀 RL이 켜집니다.'},
+    {id:'r2',a:'MC1-10',b:'FR-6',type:'ctrl',d:[`M${RLx} 160 H${GLx} V200`],note:'RL 쪽 점을 FR a접점 ⑥과도 잇습니다. Δ 운전 중에는 이 길로 RL에 전원이 들어와 RL이 깜빡여요. MC1 ⑩에는 2가닥이 물립니다.'},
+    {id:'f1',a:'MC2-10',b:'FR-2',type:'ctrl',d:[`M${FRx} 110 V444`],note:'MC2(Δ 운전)가 동작하면 보조 a접점이 닫혀 FR 코일에 전원이 들어갑니다.'},
+    {id:'f2',a:'FR-2',b:'FR-8',type:'ctrl',d:[`M${FRx} 265 H${GLx}`,`M${GLx} 240 V290`],note:'FR 접점 공통 ⑧을 같은 점에 묶습니다. 도면의 a접점(⑧-⑥)과 b접점(⑧-⑤)은 같은 ⑧번 단자를 써요.'},
+    {id:'g1',a:'FR-5',b:'GL-1',type:'ctrl',d:[`M${GLx} 330 V444`],note:'FR b접점이 닫혀 있을 때 GL이 켜집니다. FR a접점과 번갈아 열고 닫히므로 RL과 GL이 교대로 깜빡여요.'},
+    {id:'y1',a:'EOCR-5',b:'YL-1',type:'ctrl',d:[`M${EA} 330 V444`],note:'과부하로 EOCR이 트립하면 ⑩-⑤가 닫혀 YL이 켜집니다. EOCR을 리셋할 때까지 켜져 있어요.'},
+    {id:'n1',a:'EOCR-3',b:'EOCR-12',type:'ctrl',d:[`M120 85 H${Nx} V530 H${EP} V476`],note:'EOCR 앞단(L3)에서 제어회로 공통선을 따서 EOCR ⑫로 보냅니다.'},
+    {id:'n2',a:'EOCR-12',b:'YL-2',type:'ctrl',d:[`M${EP} 530 H${EA} V476`],note:N_NOTE},
+    {id:'n3',a:'YL-2',b:'T-7',type:'ctrl',d:[`M${EA} 530 H${S} V476`],note:N_NOTE},
+    {id:'n4',a:'T-7',b:'MC1-12',type:'ctrl',d:[`M${S} 530 H${TS} V476`],note:N_NOTE},
+    {id:'n5',a:'MC1-12',b:'MC2-12',type:'ctrl',d:[`M${TS} 530 H${M2} V476`],note:N_NOTE},
+    {id:'n6',a:'MC2-12',b:'RL-2',type:'ctrl',d:[`M${M2} 530 H${RLx} V476`],note:N_NOTE},
+    {id:'n7',a:'RL-2',b:'GL-2',type:'ctrl',d:[`M${RLx} 530 H${GLx} V476`],note:'RL과 GL은 같은 램프 박스 안이라 공통선을 함 안에서 건너 줍니다.'},
+    {id:'n8',a:'GL-2',b:'FR-7',type:'ctrl',d:[`M${GLx} 530 H${FRx} V476`],note:N_NOTE}
+  ];
+  const sym = ()=>{
+    let s='';
+    s+=`<circle class="fillp" cx="${EP}" cy="460" r="16"/>`+T_(EP,463,'EOCR','lbl c" style="font-size:8px')+term(EP,444)+term(EP,476);
+    s+=hContact(EB1,EB2,'b',{eocr:1,label:'EOCR'});
+    s+=contact(EA,290,330,'a',{label:'EOCR',eocr:1});
+    s+=lamp(EA,'YL');
+    s+=contact(S,70,110,'a',{pb:1,label:'PB1',lx:22});
+    s+=contact(TS,70,110,'a',{label:'T'});
+    s+=contact(S,200,240,'b',{pb:1,label:'PB0'});
+    s+=coil(S,'T');
+    s+=contact(TS,200,240,'b',{label:'T',timer:1});
+    s+=contact(M2,200,240,'a',{label:'T',timer:1,lx:22});
+    s+=contact(TS,290,330,'b',{label:'MC2'})+coil(TS,'MC1',true);
+    s+=contact(M2,290,330,'b',{label:'MC1'})+coil(M2,'MC2',true);
+    s+=contact(RLx,70,110,'a',{label:'MC1'})+lamp(RLx,'RL');
+    s+=contact(GLx,200,240,'a',{label:'FR',flicker:1,lx:22});
+    s+=contact(GLx,290,330,'b',{label:'FR',flicker:1,lx:18});
+    s+=lamp(GLx,'GL');
+    s+=contact(FRx,70,110,'a',{label:'MC2'})+coil(FRx,'FR');
+    return s;
+  };
+  const JN=[[40,70],[120,85],[120,165],[80,175],[40,185],[120,320],[40,330],[80,340],[80,435],
+    [EP,40],[EP,250],[S,40],[TS,40],[RLx,40],[S,130],[S,160],[TS,160],[RLx,160],[GLx,265],[FRx,265],
+    [EP,530],[EA,530],[S,530],[TS,530],[M2,530],[RLx,530],[GLx,530]];
+  const LAYOUT = {
+    TBL:{x:40,y:50},
+    PBS:{x:420,y:40,order:['PB0','PB1']},
+    TBM:{x:40,y:292},
+    TBX:{x:150,y:292},
+    LAMPS:{x:350,y:296,order:['RL','GL','YL']},
+    SOCKETS:['MC1','MC2','EOCR','FR','T']
+  };
+  const OPS=`<li><b>전원</b>: 3상 220V 중 EOCR 앞단의 L1·L3에서 제어 전원(AC 220V)을 받습니다. EOCR은 ⑥-⑫로 전원을 받아 전류를 감시합니다.</li>
+<li><b>주회로</b>: 6번과 같은 Y-Δ 회로입니다. MC1이 들어가면 X Y Z가 한 점으로 묶여 <b>Y 결선</b>, MC2가 들어가면 X Y Z에 각각 L2·L3·L1이 들어가 <b>Δ 결선</b>이 됩니다.</li>
+<li><b>Y 기동</b>: PB1을 누르면 PB0 b접점을 거쳐 T 코일이 여자되고, T 순시 a접점(①-③)으로 자기유지됩니다. T 한시 b접점과 MC2 b접점을 거쳐 MC1이 여자되어 Y 결선으로 기동하고 RL이 켜집니다.</li>
+<li><b>Δ 운전</b>: T 설정 시간이 지나면 MC1이 꺼지고, 한시 a접점과 MC1 b접점을 거쳐 MC2가 여자되어 Δ 결선으로 운전합니다. MC2 보조 a접점으로 FR이 동작해 FR a접점(RL 쪽)과 b접점(GL 쪽)이 번갈아 닫히므로 <b>RL과 GL이 교대로 깜빡입니다</b>.</li>
+<li><b>정지</b>: 이 문제의 PB0은 윗줄이 아니라 T 코일 바로 앞에 있습니다. PB0을 누르면 T가 꺼지면서 자기유지가 풀려 MC2·FR·램프가 모두 꺼집니다.</li>
+<li><b>과부하</b>: EOCR이 트립하면 b접점(⑩-④)이 열려 운전 회로 전체가 끊기고, a접점(⑩-⑤)이 닫혀 YL이 켜집니다.</li>
+<li><b>인터록</b>: MC1·MC2의 보조 b접점이 서로의 코일 회로에 들어 있어 Y와 Δ가 동시에 들어가지 않습니다.</li>`;
+  return {title:'타이머(T)에 의한 Y-Δ 기동과 Δ 운전 중 RL·GL 교대 점멸(FR)',W:950,ELM:P6.ELM,EL,WIRES,sym,mainSym:P6.mainSym,JN,LAYOUT,OPS};
+})();
+
+/* ---------- 공개문제 8 : 전동기 2대 (M1 → M2 간헐 운전) ---------- */
+const PR8 = (()=>{
+  const Px=284, Nx=296, EP=330, EA=385, EB1=400, EB2=450, S=540, TS=620, F=690, M2=760, RLx=830, GLx=900;
+  const ELM = {
+    EO_R:{comp:'EOCR',name:'EOCR 주회로 (L1)',ans:[1,7],exact:true,slots:[[26,100],[26,150]]},
+    EO_S:{comp:'EOCR',name:'EOCR 주회로 (L2)',ans:[2,8],exact:true,slots:[[66,100],[66,150]]},
+    EO_T:{comp:'EOCR',name:'EOCR 주회로 (L3)',ans:[3,9],exact:true,slots:[[106,100],[106,150]]},
+    M1_R:{comp:'MC1',name:'MC1 주접점 (L1 → U1)',ans:[1,7],exact:true,slots:[[24,228],[24,252]]},
+    M1_S:{comp:'MC1',name:'MC1 주접점 (L2 → V1)',ans:[2,8],exact:true,slots:[[64,228],[64,252]]},
+    M1_T:{comp:'MC1',name:'MC1 주접점 (L3 → W1)',ans:[3,9],exact:true,slots:[[104,228],[104,252]]},
+    M2_R:{comp:'MC2',name:'MC2 주접점 (L1 → U2)',ans:[1,7],exact:true,slots:[[174,228],[174,252]]},
+    M2_S:{comp:'MC2',name:'MC2 주접점 (L2 → V2)',ans:[2,8],exact:true,slots:[[214,228],[214,252]]},
+    M2_T:{comp:'MC2',name:'MC2 주접점 (L3 → W2)',ans:[3,9],exact:true,slots:[[254,228],[254,252]]}
+  };
+  const EL = {
+    EO_P:{comp:'EOCR',name:'EOCR 전원',ans:[6,12],slots:[[EP+19,433],[EP+19,487]]},
+    EO_B:{comp:'EOCR',name:'EOCR b접점 (윗줄 전원선)',ans:[10,4],alt:[[11,4]],slots:[[EB1+10,56],[EB2-10,56]]},
+    EO_A:{comp:'EOCR',name:'EOCR a접점 (YL)',ans:[10,5],alt:[[11,5]],slots:V(EA,290,330)},
+    T_I:{comp:'T',name:'T 순시 a접점 (자기유지)',ans:[1,3],slots:V(TS,70,110)},
+    T_C:{comp:'T',name:'T 코일',ans:[2,7],slots:C(S)},
+    T_B:{comp:'T',name:'T 한시 b접점 (MC1 쪽)',ans:[8,5],slots:V(TS,200,240)},
+    M2_B:{comp:'MC2',name:'MC2 보조 b접점 (인터록)',ans:[5,11],slots:V(TS,290,330)},
+    M1_C:{comp:'MC1',name:'MC1 코일',ans:[6,12],slots:C(TS)},
+    T_A:{comp:'T',name:'T 한시 a접점 (FR 쪽)',ans:[8,6],slots:V(F,200,240)},
+    FR_C:{comp:'FR',name:'FR 코일 (전원)',ans:[2,7],slots:C(F)},
+    FR_A:{comp:'FR',name:'FR a접점 (MC2 쪽)',ans:[8,6],slots:V(M2,200,240)},
+    M1_B:{comp:'MC1',name:'MC1 보조 b접점 (인터록)',ans:[5,11],slots:V(M2,290,330)},
+    M2_C:{comp:'MC2',name:'MC2 코일',ans:[6,12],slots:C(M2)},
+    M1_A:{comp:'MC1',name:'MC1 보조 a접점 (RL)',ans:[4,10],slots:V(RLx,70,110)},
+    M2_A:{comp:'MC2',name:'MC2 보조 a접점 (GL)',ans:[4,10],slots:V(GLx,70,110)}
+  };
+  const N_NOTE='L3 쪽 공통선입니다. 한 단자에 2가닥을 넘지 않도록 옆 기구로 건너가며 차례로 이어요.';
+  const WIRES = [
+    ...P1.WIRES.filter(w=>['m1','m2','m3','m4','m5','m6','m7','m8','m9'].includes(w.id)).map(w=>['m7','m8','m9'].includes(w.id)?Object.assign({},w,{note:'EOCR 출력을 MC1 입력에서 MC2 입력으로 같은 상끼리 건너 연결합니다. 두 전동기 모두 같은 방향으로 돕니다.'}):w),
+    {id:'m10',a:'MC1-7',b:'TBM-U1',type:'main',d:['M40 260 V330'],note:'MC1 출력을 전동기 M1 단자대 U1로 보냅니다.'},
+    {id:'m11',a:'MC1-8',b:'TBM-V1',type:'main',d:['M80 260 V330']},
+    {id:'m12',a:'MC1-9',b:'TBM-W1',type:'main',d:['M120 260 V330']},
+    {id:'m13',a:'MC2-7',b:'TBN-U2',type:'main',d:['M190 260 V330'],note:'MC2 출력을 전동기 M2 단자대 U2로 보냅니다. 상을 바꾸지 않고 그대로 연결해요.'},
+    {id:'m14',a:'MC2-8',b:'TBN-V2',type:'main',d:['M230 260 V330']},
+    {id:'m15',a:'MC2-9',b:'TBN-W2',type:'main',d:['M270 260 V330']},
+    {id:'p1',a:'EOCR-1',b:'EOCR-6',type:'ctrl',d:[`M40 70 H${Px} V40 H${EP} V444`],note:'EOCR 앞단(L1)에서 제어 전원을 따서 EOCR 전원 ⑥으로 보냅니다. EOCR ①에는 주회로선과 이 선, 2가닥이 물려요.'},
+    {id:'p2',a:'EOCR-6',b:'EOCR-10',type:'ctrl',d:[`M${EP} 40 H${EB1}`,`M${EP} 250 H${EA} V290`],note:'EOCR 접점 공통 ⑩을 전원선에 묶습니다. 도면의 b접점(⑩-④)과 a접점(⑩-⑤)은 같은 ⑩번 단자를 씁니다.'},
+    {id:'q1',a:'EOCR-4',b:'PB1-a1',type:'ctrl',d:[`M${EB2} 40 H${S} V70`],note:'이 문제는 윗줄 전원선에 PB0이 없습니다. EOCR b접점을 지난 전원을 바로 기동 버튼 PB1 a접점으로 보냅니다.'},
+    {id:'q2',a:'PB1-a1',b:'T-1',type:'ctrl',d:[`M${S} 40 H${TS} V70`],note:'같은 윗줄 전원을 T 순시 a접점 ①로 보내 자기유지 회로를 만듭니다.'},
+    {id:'q3',a:'T-1',b:'MC1-4',type:'ctrl',d:[`M${TS} 40 H${RLx} V70`],note:'RL용 MC1 보조 a접점 ④도 같은 전원선에서 받습니다.'},
+    {id:'q4',a:'MC1-4',b:'MC2-4',type:'ctrl',d:[`M${RLx} 40 H${GLx} V70`],note:'MC1 ④에서 GL용 MC2 ④로 건너 연결합니다.'},
+    {id:'c1',a:'PB1-a2',b:'T-3',type:'ctrl',d:[`M${S} 110 V130 H${TS} V110`],note:'PB1 출력과 T 순시 a접점 출력 ③을 한 점으로 묶습니다.'},
+    {id:'c2',a:'T-3',b:'T-8',type:'ctrl',d:[`M${S} 130 V160 H${TS} V200`,`M${TS} 160 H${F} V200`],note:'자기유지된 전원을 T 한시 접점 공통 ⑧로 보냅니다. 한시 b(⑧-⑤)와 한시 a(⑧-⑥)는 공통 ⑧을 함께 써요.'},
+    {id:'c3',a:'T-8',b:'FR-8',type:'ctrl',d:[`M${F} 160 H${M2} V200`],note:'같은 점에서 FR a접점 공통 ⑧로 건너 줍니다.'},
+    {id:'c4',a:'FR-8',b:'PB0-b1',type:'ctrl',d:[`M${S} 160 V200`],note:'같은 점에서 정지 버튼 PB0 b접점으로 보냅니다. 이 문제는 PB0이 T 코일 바로 앞에 있어요.'},
+    {id:'c5',a:'PB0-b2',b:'T-2',type:'ctrl',d:[`M${S} 240 V444`],note:'PB0을 지나 T 코일 ②로 갑니다. PB0을 누르면 T가 꺼지면서 순시 a접점의 자기유지도 풀려 전체가 정지합니다.'},
+    {id:'d1',a:'T-5',b:'MC2-5',type:'ctrl',d:[`M${TS} 240 V290`],note:'T 한시 b접점 출력을 MC2 보조 b접점(인터록)으로 보냅니다.'},
+    {id:'d2',a:'MC2-11',b:'MC1-6',type:'ctrl',d:[`M${TS} 330 V444`],note:'T 설정 시간 전이고 MC2가 쉬고 있을 때 MC1 코일에 전원이 들어가 M1이 돕니다.'},
+    {id:'f1',a:'T-6',b:'FR-2',type:'ctrl',d:[`M${F} 240 V444`],note:'T 설정 시간이 지나 한시 a접점이 닫히면 FR 코일에 전원이 들어갑니다.'},
+    {id:'e1',a:'FR-6',b:'MC1-5',type:'ctrl',d:[`M${M2} 240 V290`],note:'FR a접점 출력을 MC1 보조 b접점(인터록)으로 보냅니다. FR a접점이 주기적으로 열리고 닫혀요.'},
+    {id:'e2',a:'MC1-11',b:'MC2-6',type:'ctrl',d:[`M${M2} 330 V444`],note:'MC1이 꺼져 있을 때 FR 주기에 맞춰 MC2 코일이 켜졌다 꺼졌다 합니다.'},
+    {id:'r1',a:'MC1-10',b:'RL-1',type:'ctrl',d:[`M${RLx} 110 V444`],note:'MC1이 동작하면 보조 a접점이 닫혀 RL이 켜집니다.'},
+    {id:'g1',a:'MC2-10',b:'GL-1',type:'ctrl',d:[`M${GLx} 110 V444`],note:'MC2가 동작하면 보조 a접점이 닫혀 GL이 켜집니다. MC2가 간헐 운전하므로 GL도 깜빡여요.'},
+    {id:'y1',a:'EOCR-5',b:'YL-1',type:'ctrl',d:[`M${EA} 330 V444`],note:'과부하로 EOCR이 트립하면 ⑩-⑤가 닫혀 YL이 켜집니다. EOCR을 리셋할 때까지 켜져 있어요.'},
+    {id:'n1',a:'EOCR-3',b:'EOCR-12',type:'ctrl',d:[`M120 85 H${Nx} V530 H${EP} V476`],note:'EOCR 앞단(L3)에서 제어회로 공통선을 따서 EOCR ⑫로 보냅니다.'},
+    {id:'n2',a:'EOCR-12',b:'YL-2',type:'ctrl',d:[`M${EP} 530 H${EA} V476`],note:N_NOTE},
+    {id:'n3',a:'YL-2',b:'T-7',type:'ctrl',d:[`M${EA} 530 H${S} V476`],note:N_NOTE},
+    {id:'n4',a:'T-7',b:'MC1-12',type:'ctrl',d:[`M${S} 530 H${TS} V476`],note:N_NOTE},
+    {id:'n5',a:'MC1-12',b:'FR-7',type:'ctrl',d:[`M${TS} 530 H${F} V476`],note:N_NOTE},
+    {id:'n6',a:'FR-7',b:'MC2-12',type:'ctrl',d:[`M${F} 530 H${M2} V476`],note:N_NOTE},
+    {id:'n7',a:'MC2-12',b:'RL-2',type:'ctrl',d:[`M${M2} 530 H${RLx} V476`],note:N_NOTE},
+    {id:'n8',a:'RL-2',b:'GL-2',type:'ctrl',d:[`M${RLx} 530 H${GLx} V476`],note:'RL과 GL은 같은 램프 박스 안이라 공통선을 함 안에서 건너 줍니다.'}
+  ];
+  const mainSym = ()=>{
+    let s='';
+    [40,80,120].forEach((x,i)=>{ s+=`<rect class="fillp" x="${x-5}" y="20" width="10" height="10"/>`+T_(x,14,['L1','L2','L3'][i],'lbl c sm'); });
+    s+=T_(134,29,'3P AC 220V','tag')+T_(134,60,'MCCB 생략 (직결)','tag');
+    s+=`<rect class="fillp" x="22" y="110" width="116" height="30" rx="2"/>`;
+    [40,80,120].forEach(x=>s+=L(x,110,x,140)+`<circle class="fillp" cx="${x}" cy="125" r="5"/>`+term(x,110)+term(x,140));
+    s+=T_(146,130,'EOCR','lbl sm');
+    [40,80,120].forEach(x=>s+=mainContact(x,220,260)); s+=L(45.5,241.5,128,241.5,'dash')+T_(134,246,'MC1','lbl sm');
+    [190,230,270].forEach(x=>s+=mainContact(x,220,260)); s+=L(195.5,241.5,280,241.5,'dash')+T_(284,246,'MC2','lbl sm');
+    const mot=(xs,names,lab)=>{ let t=''; xs.forEach((x,i)=>{ t+=`<rect class="fillp" x="${x-5}" y="330" width="10" height="10"/>`+T_(x+7,339,names[i],'tag'); });
+      const c=xs[1]; t+=`<path d="M${xs[0]} 340 V352 L${c-14} 368"/><path d="M${c} 340 V362"/><path d="M${xs[2]} 340 V352 L${c+14} 368"/><circle class="fillp" cx="${c}" cy="382" r="20"/>`+T_(c,387,lab,'lbl c'); return t; };
+    s+=mot([40,80,120],['U1','V1','W1'],'M1')+mot([190,230,270],['U2','V2','W2'],'M2');
+    return s;
+  };
+  const sym = ()=>{
+    let s='';
+    s+=`<circle class="fillp" cx="${EP}" cy="460" r="16"/>`+T_(EP,463,'EOCR','lbl c" style="font-size:8px')+term(EP,444)+term(EP,476);
+    s+=hContact(EB1,EB2,'b',{eocr:1,label:'EOCR'});
+    s+=contact(EA,290,330,'a',{label:'EOCR',eocr:1});
+    s+=lamp(EA,'YL');
+    s+=contact(S,70,110,'a',{pb:1,label:'PB1',lx:22});
+    s+=contact(TS,70,110,'a',{label:'T'});
+    s+=contact(S,200,240,'b',{pb:1,label:'PB0'});
+    s+=coil(S,'T');
+    s+=contact(TS,200,240,'b',{label:'T',timer:1});
+    s+=contact(TS,290,330,'b',{label:'MC2'})+coil(TS,'MC1',true);
+    s+=contact(F,200,240,'a',{label:'T',timer:1,lx:22});
+    s+=coil(F,'FR');
+    s+=contact(M2,200,240,'a',{label:'FR',flicker:1,lx:22});
+    s+=contact(M2,290,330,'b',{label:'MC1'})+coil(M2,'MC2',true);
+    s+=contact(RLx,70,110,'a',{label:'MC1'})+contact(GLx,70,110,'a',{label:'MC2'});
+    s+=lamp(RLx,'RL')+lamp(GLx,'GL');
+    return s;
+  };
+  const JN=[[40,70],[120,85],[40,180],[80,190],[120,200],
+    [EP,40],[EP,250],[S,40],[TS,40],[RLx,40],[S,130],[S,160],[TS,160],[F,160],
+    [EP,530],[EA,530],[S,530],[TS,530],[F,530],[M2,530],[RLx,530]];
+  const LAYOUT = {
+    PBS:{x:40,y:40,order:['PB1','PB0']},
+    TBL:{x:488,y:50},
+    LAMPS:{x:40,y:296,order:['YL','GL','RL']},
+    TBM:{x:340,y:292,names:['U1','V1','W1']},
+    TBN:{x:470,y:292,names:['U2','V2','W2']},
+    SOCKETS:['T','FR','MC1','MC2','EOCR']
+  };
+  const OPS=`<li><b>전원</b>: 3상 220V 중 EOCR 앞단의 L1·L3에서 제어 전원(AC 220V)을 받습니다. EOCR은 ⑥-⑫로 전원을 받아 전류를 감시합니다.</li>
+<li><b>주회로</b>: 전동기가 2대입니다. MC1은 M1(U1 V1 W1), MC2는 M2(U2 V2 W2)를 돌리며, 두 대 모두 상을 바꾸지 않고 같은 순서로 연결합니다.</li>
+<li><b>M1 운전</b>: PB1을 누르면 PB0 b접점을 거쳐 T 코일이 여자되고 T 순시 a접점(①-③)으로 자기유지됩니다. T 한시 b접점과 MC2 b접점을 거쳐 MC1이 여자되어 M1이 돌고 RL이 켜집니다.</li>
+<li><b>M2 간헐 운전</b>: T 설정 시간이 지나면 한시 b접점이 열려 MC1이 꺼지고(M1 정지, RL 소등), 한시 a접점이 닫혀 FR이 동작합니다. FR a접점이 주기적으로 열리고 닫히므로 MC1 b접점을 거쳐 MC2가 켜졌다 꺼졌다 하며 M2가 간헐 운전하고 GL이 깜빡입니다.</li>
+<li><b>정지</b>: 이 문제의 PB0은 T 코일 바로 앞에 있습니다. PB0을 누르면 T가 꺼지면서 자기유지가 풀려 FR·MC2·램프가 모두 꺼집니다.</li>
+<li><b>과부하</b>: EOCR이 트립하면 b접점(⑩-④)이 열려 운전 회로 전체가 끊기고, a접점(⑩-⑤)이 닫혀 YL이 켜집니다.</li>
+<li><b>인터록</b>: MC1·MC2의 보조 b접점이 서로의 코일 회로에 들어 있어 두 접촉기가 동시에 들어가지 않습니다.</li>`;
+  return {title:'타이머(T)·플리커 릴레이(FR)에 의한 전동기 2대 순차 운전(M1 → M2 간헐 운전)',W:950,ELM,EL,WIRES,sym,mainSym,JN,LAYOUT,OPS};
+})();
+
+/* ---------- 공개문제 9 : 전동기 2대 (M1 간헐 → M2 연속) ---------- */
+const PR9 = (()=>{
+  const Px=284, Nx=296, EP=330, EA=385, EB1=400, EB2=450, S=540, TS=620, F=690, M2=760, RLx=830, GLx=900;
+  const EL = {
+    EO_P:{comp:'EOCR',name:'EOCR 전원',ans:[6,12],slots:[[EP+19,433],[EP+19,487]]},
+    EO_B:{comp:'EOCR',name:'EOCR b접점 (윗줄 전원선)',ans:[10,4],alt:[[11,4]],slots:[[EB1+10,56],[EB2-10,56]]},
+    EO_A:{comp:'EOCR',name:'EOCR a접점 (YL)',ans:[10,5],alt:[[11,5]],slots:V(EA,290,330)},
+    T_I:{comp:'T',name:'T 순시 a접점 (자기유지)',ans:[1,3],slots:V(TS,70,110)},
+    T_C:{comp:'T',name:'T 코일',ans:[2,7],slots:C(S)},
+    T_B:{comp:'T',name:'T 한시 b접점 (MC1·FR 쪽)',ans:[8,5],slots:V(TS,200,240)},
+    FR_B:{comp:'FR',name:'FR b접점 (MC1 쪽)',ans:[8,5],slots:V(TS,290,330)},
+    M2_B:{comp:'MC2',name:'MC2 보조 b접점 (인터록)',ans:[5,11],slots:V(TS,360,400)},
+    M1_C:{comp:'MC1',name:'MC1 코일',ans:[6,12],slots:C(TS)},
+    FR_C:{comp:'FR',name:'FR 코일 (전원)',ans:[2,7],slots:C(F)},
+    T_A:{comp:'T',name:'T 한시 a접점 (MC2 쪽)',ans:[8,6],slots:V(M2,200,240)},
+    M1_B:{comp:'MC1',name:'MC1 보조 b접점 (인터록)',ans:[5,11],slots:V(M2,290,330)},
+    M2_C:{comp:'MC2',name:'MC2 코일',ans:[6,12],slots:C(M2)},
+    M1_A:{comp:'MC1',name:'MC1 보조 a접점 (RL)',ans:[4,10],slots:V(RLx,200,240)},
+    M2_A:{comp:'MC2',name:'MC2 보조 a접점 (GL)',ans:[4,10],slots:V(GLx,200,240)}
+  };
+  const N_NOTE='L3 쪽 공통선입니다. 한 단자에 2가닥을 넘지 않도록 옆 기구로 건너가며 차례로 이어요.';
+  const WIRES = [
+    ...PR8.WIRES.filter(w=>w.type==='main'),
+    {id:'p1',a:'EOCR-1',b:'EOCR-6',type:'ctrl',d:[`M40 70 H${Px} V40 H${EP} V444`],note:'EOCR 앞단(L1)에서 제어 전원을 따서 EOCR 전원 ⑥으로 보냅니다. EOCR ①에는 주회로선과 이 선, 2가닥이 물려요.'},
+    {id:'p2',a:'EOCR-6',b:'EOCR-10',type:'ctrl',d:[`M${EP} 40 H${EB1}`,`M${EP} 250 H${EA} V290`],note:'EOCR 접점 공통 ⑩을 전원선에 묶습니다. 도면의 b접점(⑩-④)과 a접점(⑩-⑤)은 같은 ⑩번 단자를 씁니다.'},
+    {id:'q1',a:'EOCR-4',b:'PB1-a1',type:'ctrl',d:[`M${EB2} 40 H${S} V70`],note:'이 문제는 윗줄 전원선에 PB0이 없습니다. EOCR b접점을 지난 전원을 바로 기동 버튼 PB1 a접점으로 보냅니다.'},
+    {id:'q2',a:'PB1-a1',b:'T-1',type:'ctrl',d:[`M${S} 40 H${TS} V70`],note:'같은 윗줄 전원을 T 순시 a접점 ①로 보내 자기유지 회로를 만듭니다.'},
+    {id:'c1',a:'PB1-a2',b:'T-3',type:'ctrl',d:[`M${S} 110 V130 H${TS} V110`],note:'PB1 출력과 T 순시 a접점 출력 ③을 한 점으로 묶습니다. 이 점이 아래 모든 회로와 RL·GL의 전원이 돼요.'},
+    {id:'c2',a:'T-3',b:'PB0-b1',type:'ctrl',d:[`M${S} 130 V200`],note:'자기유지된 전원을 정지 버튼 PB0 b접점으로 보냅니다. 이 문제는 PB0이 T 코일 바로 앞에 있어요.'},
+    {id:'c3',a:'PB0-b1',b:'T-8',type:'ctrl',d:[`M${TS} 130 V200`,`M${TS} 130 H${M2} V200`],note:'같은 점에서 T 한시 접점 공통 ⑧로 건너 줍니다. 한시 b(⑧-⑤)와 한시 a(⑧-⑥)는 공통 ⑧을 함께 써요.'},
+    {id:'c4',a:'T-8',b:'MC1-4',type:'ctrl',d:[`M${M2} 130 H${RLx} V200`],note:'RL용 MC1 보조 a접점 ④도 이 점에서 받습니다. 윗줄 전원선이 아니라 자기유지 뒤쪽이에요.'},
+    {id:'c5',a:'MC1-4',b:'MC2-4',type:'ctrl',d:[`M${RLx} 130 H${GLx} V200`],note:'MC1 ④에서 GL용 MC2 ④로 건너 연결합니다.'},
+    {id:'c6',a:'PB0-b2',b:'T-2',type:'ctrl',d:[`M${S} 240 V444`],note:'PB0을 지나 T 코일 ②로 갑니다. PB0을 누르면 T가 꺼지면서 자기유지가 풀려 전체가 정지합니다.'},
+    {id:'d1',a:'T-5',b:'FR-8',type:'ctrl',d:[`M${TS} 240 V290`],note:'T 한시 b접점 출력을 FR b접점 공통 ⑧로 보냅니다.'},
+    {id:'d2',a:'FR-8',b:'FR-2',type:'ctrl',d:[`M${TS} 265 H${F} V444`],note:'FR 코일 ②도 같은 점에서 받습니다. T 설정 시간 동안만 FR이 동작해요. 같은 소켓 안 점퍼예요.'},
+    {id:'d3',a:'FR-5',b:'MC2-5',type:'ctrl',d:[`M${TS} 330 V360`],note:'FR b접점 출력을 MC2 보조 b접점(인터록)으로 보냅니다.'},
+    {id:'d4',a:'MC2-11',b:'MC1-6',type:'ctrl',d:[`M${TS} 400 V444`],note:'FR b접점이 주기적으로 열리고 닫혀 MC1이 켜졌다 꺼졌다 합니다(M1 간헐 운전).'},
+    {id:'e1',a:'T-6',b:'MC1-5',type:'ctrl',d:[`M${M2} 240 V290`],note:'T 한시 a접점 출력을 MC1 보조 b접점(인터록)으로 보냅니다.'},
+    {id:'e2',a:'MC1-11',b:'MC2-6',type:'ctrl',d:[`M${M2} 330 V444`],note:'T 설정 시간이 지나고 MC1이 꺼져 있으면 MC2 코일에 전원이 들어가 M2가 계속 돕니다.'},
+    {id:'r1',a:'MC1-10',b:'RL-1',type:'ctrl',d:[`M${RLx} 240 V444`],note:'MC1이 동작하면 보조 a접점이 닫혀 RL이 켜집니다. MC1이 간헐 운전하므로 RL도 깜빡여요.'},
+    {id:'g1',a:'MC2-10',b:'GL-1',type:'ctrl',d:[`M${GLx} 240 V444`],note:'MC2가 동작하면 보조 a접점이 닫혀 GL이 켜집니다.'},
+    {id:'y1',a:'EOCR-5',b:'YL-1',type:'ctrl',d:[`M${EA} 330 V444`],note:'과부하로 EOCR이 트립하면 ⑩-⑤가 닫혀 YL이 켜집니다. EOCR을 리셋할 때까지 켜져 있어요.'},
+    {id:'n1',a:'EOCR-3',b:'EOCR-12',type:'ctrl',d:[`M120 85 H${Nx} V530 H${EP} V476`],note:'EOCR 앞단(L3)에서 제어회로 공통선을 따서 EOCR ⑫로 보냅니다.'},
+    {id:'n2',a:'EOCR-12',b:'YL-2',type:'ctrl',d:[`M${EP} 530 H${EA} V476`],note:N_NOTE},
+    {id:'n3',a:'YL-2',b:'T-7',type:'ctrl',d:[`M${EA} 530 H${S} V476`],note:N_NOTE},
+    {id:'n4',a:'T-7',b:'MC1-12',type:'ctrl',d:[`M${S} 530 H${TS} V476`],note:N_NOTE},
+    {id:'n5',a:'MC1-12',b:'FR-7',type:'ctrl',d:[`M${TS} 530 H${F} V476`],note:N_NOTE},
+    {id:'n6',a:'FR-7',b:'MC2-12',type:'ctrl',d:[`M${F} 530 H${M2} V476`],note:N_NOTE},
+    {id:'n7',a:'MC2-12',b:'RL-2',type:'ctrl',d:[`M${M2} 530 H${RLx} V476`],note:N_NOTE},
+    {id:'n8',a:'RL-2',b:'GL-2',type:'ctrl',d:[`M${RLx} 530 H${GLx} V476`],note:'RL과 GL은 같은 램프 박스 안이라 공통선을 함 안에서 건너 줍니다.'}
+  ];
+  const sym = ()=>{
+    let s='';
+    s+=`<circle class="fillp" cx="${EP}" cy="460" r="16"/>`+T_(EP,463,'EOCR','lbl c" style="font-size:8px')+term(EP,444)+term(EP,476);
+    s+=hContact(EB1,EB2,'b',{eocr:1,label:'EOCR'});
+    s+=contact(EA,290,330,'a',{label:'EOCR',eocr:1});
+    s+=lamp(EA,'YL');
+    s+=contact(S,70,110,'a',{pb:1,label:'PB1',lx:22});
+    s+=contact(TS,70,110,'a',{label:'T'});
+    s+=contact(S,200,240,'b',{pb:1,label:'PB0'});
+    s+=coil(S,'T');
+    s+=contact(TS,200,240,'b',{label:'T',timer:1});
+    s+=contact(TS,290,330,'b',{label:'FR',flicker:1,lx:18});
+    s+=contact(TS,360,400,'b',{label:'MC2'})+coil(TS,'MC1',true);
+    s+=coil(F,'FR');
+    s+=contact(M2,200,240,'a',{label:'T',timer:1,lx:22});
+    s+=contact(M2,290,330,'b',{label:'MC1'})+coil(M2,'MC2',true);
+    s+=contact(RLx,200,240,'a',{label:'MC1'})+contact(GLx,200,240,'a',{label:'MC2'});
+    s+=lamp(RLx,'RL')+lamp(GLx,'GL');
+    return s;
+  };
+  const JN=[[40,70],[120,85],[40,180],[80,190],[120,200],
+    [EP,40],[EP,250],[S,40],[S,130],[TS,130],[M2,130],[RLx,130],[TS,265],
+    [EP,530],[EA,530],[S,530],[TS,530],[F,530],[M2,530],[RLx,530]];
+  const LAYOUT = {
+    TBL:{x:40,y:50},
+    PBS:{x:420,y:40,order:['PB1','PB0']},
+    LAMPS:{x:40,y:296,order:['YL','GL','RL']},
+    TBM:{x:340,y:292,names:['U1','V1','W1']},
+    TBN:{x:470,y:292,names:['U2','V2','W2']},
+    SOCKETS:['T','FR','EOCR','MC1','MC2']
+  };
+  const OPS=`<li><b>전원</b>: 3상 220V 중 EOCR 앞단의 L1·L3에서 제어 전원(AC 220V)을 받습니다. EOCR은 ⑥-⑫로 전원을 받아 전류를 감시합니다.</li>
+<li><b>주회로</b>: 8번과 같이 전동기가 2대입니다. MC1은 M1(U1 V1 W1), MC2는 M2(U2 V2 W2)를 돌립니다.</li>
+<li><b>M1 간헐 운전</b>: PB1을 누르면 PB0 b접점을 거쳐 T 코일이 여자되고 T 순시 a접점(①-③)으로 자기유지됩니다. T 한시 b접점을 거쳐 FR이 동작하고, FR b접점이 주기적으로 열리고 닫혀 MC2 b접점을 거친 MC1이 켜졌다 꺼졌다 합니다. M1이 간헐 운전하고 RL이 깜빡입니다.</li>
+<li><b>M2 연속 운전</b>: T 설정 시간이 지나면 한시 b접점이 열려 FR과 MC1이 꺼지고(RL 소등), 한시 a접점이 닫혀 MC1 b접점을 거쳐 MC2가 여자됩니다. M2가 계속 돌고 GL이 켜집니다.</li>
+<li><b>RL·GL 전원</b>: 이 문제의 MC1·MC2 보조 a접점은 윗줄 전원선이 아니라 PB1·T 자기유지 뒤쪽에서 전원을 받습니다.</li>
+<li><b>정지</b>: PB0은 T 코일 바로 앞에 있습니다. PB0을 누르면 T가 꺼지면서 자기유지가 풀려 모두 꺼집니다.</li>
+<li><b>과부하</b>: EOCR이 트립하면 b접점(⑩-④)이 열려 운전 회로 전체가 끊기고, a접점(⑩-⑤)이 닫혀 YL이 켜집니다.</li>
+<li><b>인터록</b>: MC1·MC2의 보조 b접점이 서로의 코일 회로에 들어 있어 두 접촉기가 동시에 들어가지 않습니다.</li>`;
+  return {title:'타이머(T)·플리커 릴레이(FR)에 의한 전동기 2대 순차 운전(M1 간헐 → M2 연속 운전)',W:950,ELM:PR8.ELM,EL,WIRES,sym,mainSym:PR8.mainSym,JN,LAYOUT,OPS};
+})();
+
+/* ---------- 공개문제 10 : 전동기 2대 (FR 교대 운전 → 동시 운전) ---------- */
+const PR10 = (()=>{
+  const Px=284, Nx=296, EP=330, EA=385, EB1=400, EB2=450, S=540, TS=622, C3=692, RLx=762, C5=832, C6=902;
+  const EL = {
+    EO_P:{comp:'EOCR',name:'EOCR 전원',ans:[6,12],slots:[[EP+19,433],[EP+19,487]]},
+    EO_B:{comp:'EOCR',name:'EOCR b접점 (윗줄 전원선)',ans:[10,4],alt:[[11,4]],slots:[[EB1+10,56],[EB2-10,56]]},
+    EO_A:{comp:'EOCR',name:'EOCR a접점 (YL)',ans:[10,5],alt:[[11,5]],slots:V(EA,290,330)},
+    T_I:{comp:'T',name:'T 순시 a접점 (자기유지)',ans:[1,3],slots:V(TS,70,110)},
+    T_C:{comp:'T',name:'T 코일',ans:[2,7],slots:C(S)},
+    T_B:{comp:'T',name:'T 한시 b접점 (FR 쪽)',ans:[8,5],slots:V(TS,200,240)},
+    FR_C:{comp:'FR',name:'FR 코일 (전원)',ans:[2,7],slots:C(TS)},
+    FR_B:{comp:'FR',name:'FR b접점 (MC1 쪽)',ans:[8,5],slots:V(C3,200,240)},
+    M1_C:{comp:'MC1',name:'MC1 코일',ans:[6,12],slots:C(C3)},
+    M1_A:{comp:'MC1',name:'MC1 보조 a접점 (RL)',ans:[4,10],slots:V(RLx,200,240)},
+    FR_A:{comp:'FR',name:'FR a접점 (MC2 쪽)',ans:[8,6],slots:V(C5,200,240)},
+    M2_C:{comp:'MC2',name:'MC2 코일',ans:[6,12],slots:C(C5)},
+    T_A:{comp:'T',name:'T 한시 a접점 (MC2 쪽)',ans:[8,6],slots:V(C6,200,240)},
+    M2_A:{comp:'MC2',name:'MC2 보조 a접점 (GL)',ans:[4,10],slots:V(C6,290,330)}
+  };
+  const N_NOTE='L3 쪽 공통선입니다. 한 단자에 2가닥을 넘지 않도록 옆 기구로 건너가며 차례로 이어요.';
+  const WIRES = [
+    ...PR8.WIRES.filter(w=>w.type==='main'),
+    {id:'p1',a:'EOCR-1',b:'EOCR-6',type:'ctrl',d:[`M40 70 H${Px} V40 H${EP} V444`],note:'EOCR 앞단(L1)에서 제어 전원을 따서 EOCR 전원 ⑥으로 보냅니다. EOCR ①에는 주회로선과 이 선, 2가닥이 물려요.'},
+    {id:'p2',a:'EOCR-6',b:'EOCR-10',type:'ctrl',d:[`M${EP} 40 H${EB1}`,`M${EP} 250 H${EA} V290`],note:'EOCR 접점 공통 ⑩을 전원선에 묶습니다. 도면의 b접점(⑩-④)과 a접점(⑩-⑤)은 같은 ⑩번 단자를 씁니다.'},
+    {id:'q1',a:'EOCR-4',b:'PB1-a1',type:'ctrl',d:[`M${EB2} 40 H${S} V70`],note:'이 문제는 윗줄 전원선에 PB0이 없습니다. EOCR b접점을 지난 전원을 바로 기동 버튼 PB1 a접점으로 보냅니다.'},
+    {id:'q2',a:'PB1-a1',b:'T-1',type:'ctrl',d:[`M${S} 40 H${TS} V70`],note:'같은 윗줄 전원을 T 순시 a접점 ①로 보내 자기유지 회로를 만듭니다.'},
+    {id:'c1',a:'PB1-a2',b:'T-3',type:'ctrl',d:[`M${S} 110 V130 H${TS} V110`],note:'PB1 출력과 T 순시 a접점 출력 ③을 한 점으로 묶습니다. 이 점이 아래 모든 회로의 전원이 돼요.'},
+    {id:'c2',a:'T-3',b:'PB0-b1',type:'ctrl',d:[`M${S} 130 V200`],note:'자기유지된 전원을 정지 버튼 PB0 b접점으로 보냅니다. 이 문제는 PB0이 T 코일 바로 앞에 있어요.'},
+    {id:'c3',a:'PB0-b1',b:'T-8',type:'ctrl',d:[`M${TS} 130 V200`,`M${C5} 130 H${C6} V200`],note:'같은 점에서 T 한시 접점 공통 ⑧로 건너 줍니다. 도면 맨 오른쪽 T 한시 a접점도 같은 ⑧을 쓰므로 따로 선을 낼 필요가 없어요.'},
+    {id:'c4',a:'T-8',b:'FR-8',type:'ctrl',d:[`M${TS} 130 H${C3} V200`],note:'같은 점에서 FR 접점 공통 ⑧로 건너 줍니다. FR b(⑧-⑤)와 FR a(⑧-⑥)는 공통 ⑧을 함께 써요.'},
+    {id:'c5',a:'FR-8',b:'MC1-4',type:'ctrl',d:[`M${C3} 130 H${RLx} V200`,`M${RLx} 130 H${C5} V200`],note:'RL용 MC1 보조 a접점 ④도 이 점에서 받습니다. 도면의 FR a접점 위쪽도 같은 FR ⑧이에요.'},
+    {id:'c6',a:'PB0-b2',b:'T-2',type:'ctrl',d:[`M${S} 240 V444`],note:'PB0을 지나 T 코일 ②로 갑니다. PB0을 누르면 T가 꺼지면서 자기유지가 풀려 전체가 정지합니다.'},
+    {id:'t1',a:'T-5',b:'FR-2',type:'ctrl',d:[`M${TS} 240 V444`],note:'T 설정 시간 동안만 한시 b접점을 거쳐 FR 코일에 전원이 들어갑니다.'},
+    {id:'f1',a:'FR-5',b:'MC1-6',type:'ctrl',d:[`M${C3} 240 V444`],note:'FR b접점을 거쳐 MC1 코일로 갑니다. 이 문제는 MC1·MC2 사이에 인터록 b접점이 없어요.'},
+    {id:'r1',a:'MC1-10',b:'RL-1',type:'ctrl',d:[`M${RLx} 240 V444`],note:'MC1이 동작하면 보조 a접점이 닫혀 RL이 켜집니다.'},
+    {id:'f2',a:'FR-6',b:'MC2-6',type:'ctrl',d:[`M${C5} 240 V444`],note:'FR a접점을 거쳐 MC2 코일로 갑니다. FR이 동작하는 동안 MC1과 MC2가 번갈아 켜져요.'},
+    {id:'f3',a:'MC2-6',b:'T-6',type:'ctrl',d:[`M${C5} 265 H${C6} V240`],note:'T 한시 a접점 출력도 MC2 코일 쪽 같은 점에 묶습니다. FR a접점과 T 한시 a접점이 병렬이에요.'},
+    {id:'g0',a:'T-6',b:'MC2-4',type:'ctrl',d:[`M${C6} 265 V290`],note:'같은 점에서 GL용 MC2 보조 a접점 ④로 보냅니다.'},
+    {id:'g1',a:'MC2-10',b:'GL-1',type:'ctrl',d:[`M${C6} 330 V444`],note:'MC2가 동작하면 보조 a접점이 닫혀 GL이 켜집니다.'},
+    {id:'y1',a:'EOCR-5',b:'YL-1',type:'ctrl',d:[`M${EA} 330 V444`],note:'과부하로 EOCR이 트립하면 ⑩-⑤가 닫혀 YL이 켜집니다. EOCR을 리셋할 때까지 켜져 있어요.'},
+    {id:'n1',a:'EOCR-3',b:'EOCR-12',type:'ctrl',d:[`M120 85 H${Nx} V530 H${EP} V476`],note:'EOCR 앞단(L3)에서 제어회로 공통선을 따서 EOCR ⑫로 보냅니다.'},
+    {id:'n2',a:'EOCR-12',b:'YL-2',type:'ctrl',d:[`M${EP} 530 H${EA} V476`],note:N_NOTE},
+    {id:'n3',a:'YL-2',b:'T-7',type:'ctrl',d:[`M${EA} 530 H${S} V476`],note:N_NOTE},
+    {id:'n4',a:'T-7',b:'FR-7',type:'ctrl',d:[`M${S} 530 H${TS} V476`],note:N_NOTE},
+    {id:'n5',a:'FR-7',b:'MC1-12',type:'ctrl',d:[`M${TS} 530 H${C3} V476`],note:N_NOTE},
+    {id:'n6',a:'MC1-12',b:'RL-2',type:'ctrl',d:[`M${C3} 530 H${RLx} V476`],note:N_NOTE},
+    {id:'n7',a:'RL-2',b:'MC2-12',type:'ctrl',d:[`M${RLx} 530 H${C5} V476`],note:N_NOTE},
+    {id:'n8',a:'MC2-12',b:'GL-2',type:'ctrl',d:[`M${C5} 530 H${C6} V476`],note:N_NOTE}
+  ];
+  const sym = ()=>{
+    let s='';
+    s+=`<circle class="fillp" cx="${EP}" cy="460" r="16"/>`+T_(EP,463,'EOCR','lbl c" style="font-size:8px')+term(EP,444)+term(EP,476);
+    s+=hContact(EB1,EB2,'b',{eocr:1,label:'EOCR'});
+    s+=contact(EA,290,330,'a',{label:'EOCR',eocr:1});
+    s+=lamp(EA,'YL');
+    s+=contact(S,70,110,'a',{pb:1,label:'PB1',lx:22});
+    s+=contact(TS,70,110,'a',{label:'T'});
+    s+=contact(S,200,240,'b',{pb:1,label:'PB0'});
+    s+=coil(S,'T');
+    s+=contact(TS,200,240,'b',{label:'T',timer:1});
+    s+=coil(TS,'FR');
+    s+=contact(C3,200,240,'b',{label:'FR',flicker:1,lx:18})+coil(C3,'MC1',true);
+    s+=contact(RLx,200,240,'a',{label:'MC1'})+lamp(RLx,'RL');
+    s+=contact(C5,200,240,'a',{label:'FR',flicker:1,lx:22})+coil(C5,'MC2',true);
+    s+=contact(C6,200,240,'a',{label:'T',timer:1,lx:22});
+    s+=contact(C6,290,330,'a',{label:'MC2'})+lamp(C6,'GL');
+    return s;
+  };
+  const JN=[[40,70],[120,85],[40,180],[80,190],[120,200],
+    [EP,40],[EP,250],[S,40],[S,130],[TS,130],[C3,130],[RLx,130],[C5,130],[C5,265],[C6,265],
+    [EP,530],[EA,530],[S,530],[TS,530],[C3,530],[RLx,530],[C5,530]];
+  const LAYOUT = {
+    LAMPS:{x:40,y:38,order:['YL','RL','GL']},
+    TBL:{x:488,y:50},
+    PBS:{x:40,y:290,order:['PB1','PB0']},
+    TBM:{x:340,y:292,names:['U1','V1','W1']},
+    TBN:{x:470,y:292,names:['U2','V2','W2']},
+    SOCKETS:['FR','T','MC1','MC2','EOCR']
+  };
+  const OPS=`<li><b>전원</b>: 3상 220V 중 EOCR 앞단의 L1·L3에서 제어 전원(AC 220V)을 받습니다. EOCR은 ⑥-⑫로 전원을 받아 전류를 감시합니다.</li>
+<li><b>주회로</b>: 8·9번과 같이 전동기가 2대입니다. MC1은 M1(U1 V1 W1), MC2는 M2(U2 V2 W2)를 돌립니다.</li>
+<li><b>교대 운전</b>: PB1을 누르면 PB0 b접점을 거쳐 T 코일이 여자되고 T 순시 a접점(①-③)으로 자기유지됩니다. T 한시 b접점을 거쳐 FR이 동작하고, FR b접점(MC1 쪽)과 a접점(MC2 쪽)이 번갈아 닫혀 <b>M1과 M2가 교대로 운전</b>합니다. RL과 GL도 번갈아 켜집니다.</li>
+<li><b>동시 운전</b>: T 설정 시간이 지나면 한시 b접점이 열려 FR이 꺼지므로 FR b접점이 닫힌 채로 MC1이 계속 들어가고, T 한시 a접점이 닫혀 MC2도 계속 들어갑니다. <b>M1·M2가 함께 운전</b>하고 RL·GL이 모두 켜집니다.</li>
+<li><b>인터록 없음</b>: 이 문제는 두 전동기가 동시에 도는 회로라서 MC1·MC2 사이에 인터록 b접점이 없습니다.</li>
+<li><b>정지</b>: PB0은 T 코일 바로 앞에 있습니다. PB0을 누르면 T가 꺼지면서 자기유지가 풀려 모두 꺼집니다.</li>
+<li><b>과부하</b>: EOCR이 트립하면 b접점(⑩-④)이 열려 운전 회로 전체가 끊기고, a접점(⑩-⑤)이 닫혀 YL이 켜집니다.</li>`;
+  return {title:'타이머(T)·플리커 릴레이(FR)에 의한 전동기 2대 교대 운전 후 동시 운전',W:955,ELM:PR8.ELM,EL,WIRES,sym,mainSym:PR8.mainSym,JN,LAYOUT,OPS};
+})();
+
+const PD = ({1:P1,2:P2,3:P3,4:P4,5:P5,6:P6,7:P7,8:PR8,9:PR9,10:PR10})[CUR_PROB];
+const EL = Object.assign({}, PD.ELM||EL_MAIN, PD.EL);
 const EL_IDS = Object.keys(EL);
 const TOTAL_SLOTS = EL_IDS.reduce((n,id)=>n+EL[id].ans.length,0);
 const WIRES = PD.WIRES;
@@ -589,7 +1401,7 @@ function contact(x,y1,y2,type,o={}){
   let s=L(x,y1,x,t1)+L(x,t2,x,y2)+L(bx,t1-4,bx,t2+4);
   if(o.pb) s+=L(bx,my,bx+8*out,my);
   if(o.timer){ const tx = isA ? bx : x+2.5; s+=`<path d="M${tx} ${my-6} L${tx+9} ${my} L${tx} ${my+6}"/>`; }
-  if(o.flicker) s+=`<path d="M${bx-8} ${my} L${bx} ${my-3.6} L${bx+8} ${my} L${bx} ${my+3.6} Z" style="fill:var(--ink)"/>`;
+  if(o.flicker){ const fx = isA ? bx : x+6; s+=`<path d="M${fx-6} ${my} L${fx} ${my-3.6} L${fx+6} ${my} L${fx} ${my+3.6} Z" style="fill:var(--ink)"/>`; }
   if(o.eocr) s+=L(bx-5,my-5,bx+5,my+5)+L(bx-5,my+5,bx+5,my-5);
   s+=term(x,t1)+term(x,t2);
   if(o.label) s+=T_(x+(o.lx||15),my+5,o.label);
@@ -630,7 +1442,7 @@ function mainSym(){
   s+=`<path d="M40 340 V352 L66 368"/><path d="M80 340 V362"/><path d="M120 340 V352 L94 368"/><circle class="fillp" cx="80" cy="382" r="20"/>`+T_(80,387,'M','lbl c');
   return s;
 }
-const SYMBOLS = mainSym()+PD.sym();
+const SYMBOLS = (PD.mainSym?PD.mainSym():mainSym())+PD.sym();
 
 /* ================= 제어판 배치 (보통합판 600 × 400 mm) ================= */
 const BW=600, BH=400;
@@ -648,13 +1460,15 @@ const PIN = {}, DEV = [];
     top.forEach((p,j)=>PIN[k+'-'+p]={x:x+SOCK_W*(j+.5)/top.length,y:SOCK_Y+7,ch:'top',label:`${k} ${circ(p)}`,t:p});
     bot.forEach((p,j)=>PIN[k+'-'+p]={x:x+SOCK_W*(j+.5)/bot.length,y:SOCK_Y+SOCK_H-7,ch:'bot',label:`${k} ${circ(p)}`,t:p});
   });
-  const tb=(id,o,names,isSupply)=>{
+  const tb=(id,o,names,isSupply,noNote)=>{
     const upper=o.y<SOCK_Y, w=72, h=46;
-    DEV.push({kind:'tb',k:id,x:o.x,y:o.y,w,h,names,upper,isSupply});
+    DEV.push({kind:'tb',k:id,x:o.x,y:o.y,w,h,names,upper,isSupply,noNote});
     names.forEach((n,j)=>{ const x=o.x+12+24*j; PIN[id+'-'+n]={x,y:upper?o.y+h-8:o.y+8,ch:upper?'top':'bot',label:`${isSupply?'전원':'전동기'} 단자대 ${n}`,t:n}; });
   };
   tb('TBL',LY.TBL,['L1','L2','L3'],true);
-  tb('TBM',LY.TBM,['U','V','W'],false);
+  tb('TBM',LY.TBM,LY.TBM.names||['U','V','W'],false);
+  if(LY.TBN) tb('TBN',LY.TBN,LY.TBN.names,false,true);
+  if(LY.TBX) tb('TBX',LY.TBX,['X','Y','Z'],false,true);
   { const o=LY.LAMPS, upper=o.y<SOCK_Y, w=222, h=70;
     DEV.push({kind:'lamps',x:o.x,y:o.y,w,h,order:o.order,upper});
     o.order.forEach((n,j)=>{ const c=o.x+37+74*j, y=upper?o.y+h-7:o.y+7;
@@ -907,13 +1721,13 @@ function panelSVG(){
         s+=`<g class="pin blank"><circle cx="${x}" cy="${outer}" r="3.4"/></g>`;
         s+=d.isSupply ? `<path class="stub" d="M${x} ${outer} V${outer-38}"/>` : `<path class="stub" d="M${x} ${outer} V${outer+36}"/>`;
         s+=`<text class="tblab" x="${x}" y="${d.y+d.h/2+2.2}">${n}</text>`; });
-      s+= d.isSupply ? `<text class="note" x="${d.x+d.w+6}" y="${d.y-16}">전원 측 약 100mm 인출, 끝 10mm 피복 벗김</text>` : `<text class="note" x="${d.x+d.w+6}" y="${d.y+d.h+26}">전동기로</text>`;
+      s+= d.noNote ? '' : d.isSupply ? (d.x>BW/2 ? `<text class="note" x="${d.x-6}" y="${d.y-16}" text-anchor="end">전원 측 약 100mm 인출, 끝 10mm 피복 벗김</text>` : `<text class="note" x="${d.x+d.w+6}" y="${d.y-16}">전원 측 약 100mm 인출, 끝 10mm 피복 벗김</text>`) : (d.x>BW/2 ? `<text class="note" x="${d.x-6}" y="${d.y+d.h+26}" text-anchor="end">전동기로</text>` : `<text class="note" x="${d.x+d.w+6}" y="${d.y+d.h+26}">전동기로</text>`);
     } else if (d.kind==='lamps'){
       s+=`<rect class="cbox" x="${d.x}" y="${d.y}" width="${d.w}" height="${d.h}" rx="4"/>`;
       d.order.forEach((n,j)=>{ const c=d.x+37+74*j, cy=d.y+(d.upper?30:40); s+=`<circle cx="${c}" cy="${cy}" r="19" fill="${LAMP_FILL[n]}" class="lampc"/><text class="btxt" x="${c}" y="${cy+3.5}">${n}</text>`; });
     } else if (d.kind==='pbs'){
       s+=`<rect class="cbox" x="${d.x}" y="${d.y}" width="${d.w}" height="${d.h}" rx="4"/>`;
-      d.order.forEach((n,j)=>{ const c=d.x+38+76*j, cy=d.y+(d.upper?26:36); s+=`<circle cx="${c}" cy="${cy}" r="15" class="pbring"/><circle cx="${c}" cy="${cy}" r="11" fill="${PB_FILL[n]}"/><text class="btxt" x="${c}" y="${cy+22}" style="fill:#E6EAED">${n}</text>`; });
+      d.order.forEach((n,j)=>{ const c=d.x+38+76*j, cy=d.y+(d.upper?32:36), ly=d.upper?d.y+11:cy+22, lx=d.upper?c+24:c; s+=`<circle cx="${c}" cy="${cy}" r="15" class="pbring"/><circle cx="${c}" cy="${cy}" r="11" fill="${PB_FILL[n]}"/><text class="btxt" x="${lx}" y="${ly}" style="fill:#E6EAED">${n}</text>`; });
     }
   }
   const hl=new Set();
